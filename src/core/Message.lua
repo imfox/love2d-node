@@ -11,7 +11,7 @@
 local class = require("class");
 
 ---@class Message
----@field protected _events table<string, EventType[]> @子组件数组
+---@field protected _events table<string, EventType[]> @事件数组
 
 local Message = class();
 
@@ -52,8 +52,7 @@ end
 ---@param type string
 ---@param args []
 function Message.event(this,type,args)
-    if not this._events then return end
-    if not this._events[type] then return end
+    if not this._events or not this._events[type] then return this end
     for _,event in ipairs(this._events[type]) do
         if event.func then
             local params = {};
@@ -85,8 +84,7 @@ end
 ---@param onceOnly boolean
 ---@return Message
 function Message.off(this,type,func,onceOnly)
-    if not this._events then return end
-    if not this._events[type] then return end
+    if not this._events or not this._events[type] then return this end
     for i = #this._events[type],1,-1 do
         local event = this._events[type][i];
         if event.func == func and (onceOnly ~= true and true or event.count==1) then
@@ -100,9 +98,9 @@ end
 ---@param type string
 ---@return Message
 function Message.offAll(this,type)
-    if not this._events then return end
+    if not this._events then return this end
     if type ~= nil then
-        if not this._events[type] then return end
+        if not this._events[type] then return this end
         for i = #this._events[type],1,-1 do
             table.remove(this._events[type],i);
         end
