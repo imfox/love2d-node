@@ -101,9 +101,13 @@ end
 ---@return Message
 function Message.offAll(this,type)
     if not this._events then return end
-    if not this._events[type] then return end
-    for i = #this._events[type],1,-1 do
-        table.remove(this._events[type],i);
+    if type ~= nil then
+        if not this._events[type] then return end
+        for i = #this._events[type],1,-1 do
+            table.remove(this._events[type],i);
+        end
+    else
+        this._events = nil;
     end
     return this;
 end
