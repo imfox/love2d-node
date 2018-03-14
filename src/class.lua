@@ -61,3 +61,4 @@ function class(...)
     end
     return class_type
 end
+return class;
