@@ -11,14 +11,13 @@
 local class = require("class");
 
 ---@class Message
----@field protected _events table<string, EventType[]> @事件数组
-
 local Message = class();
 
 ---@param this Message
 function Message.ctor(this)
 
 end
+---@field protected _events table<string, EventType[]> @事件数组
 
 ---@param this Message
 ---@param type string

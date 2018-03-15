@@ -1,14 +1,16 @@
-local class = require("class");
+local import = require("Import");
+local class = import("..class");
+
 ---@type Message
-local Message = require("core.Message")
+local Message = import(".Message")
 
 ---@class Node : Message
+local Node =  class(Message);
 ---@field public new Node
 ---@field protected components Node[] @子组件数组
 ---@field public name string @名称
 ---@field public parent Node @父对象
 ---@field public destroyed boolean @是否已经被销毁
-local Node =  class(Message);
 
 function Node:ctor()
     self.name = "";
