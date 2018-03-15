@@ -25,7 +25,7 @@ end
 ---@param this Graphics
 ---@param text string
 function Graphics.print(this,text,...)
-    --love.graphics.print(text,...)
+    love.graphics.print(text,...)
 end
 
 ---@param this Graphics
@@ -34,15 +34,20 @@ end
 ---@param r number
 ---@param w number
 ---@param h number
-function Graphics._render(this,x,y,r,w,h)
+function Graphics._begin(this,x,y,r,w,h)
     love.graphics.push()
     love.graphics.translate(x,y);
     love.graphics.rotate(r);
     love.graphics.scale(w,h);
+end
 
-    -- .
+function Graphics._render(this)
+    this:print("hello world!",0,0);
+end
 
+function Graphics._end(this)
     love.graphics.pop();
 end
+
 
 return Graphics;

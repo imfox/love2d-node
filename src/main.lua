@@ -61,6 +61,12 @@ utils.tablePrint(n2);
 --n3:addChild(n1);
 
 local spr = drawable.new();
+local spr2 = drawable.new();
+spr:scale(2,1)
+spr2:addTo(spr)
+spr2:pos(50,50)
+spr2:scale(2,1)
+
 love.graphics.setBackgroundColor(0,0,0,255)
 function love.load()
     
@@ -69,5 +75,5 @@ end
 function love.update(dt)
 end
 function love.draw()
-    love.graphics.print("@3333",10,10)
+    spr:_render();
 end
