@@ -85,8 +85,7 @@ function Drawable._render(this)
     if not this.visible or this.destroyed or this.alpha == 0 or this.scaleY ==0 or this.scaleX == 0 then    -- 已经不会显示出来了
         return this;
     end
-    this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY);
-    this.graphics:_render();
+    this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY):_render();
     for _,drawable in ipairs(this.components) do 
         if drawable._render then 
             drawable:_render()

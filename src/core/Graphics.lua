@@ -5,6 +5,8 @@
 local import = require("Import");
 local class = import("..class");
 
+
+
 --[[
     实际上这里应该放出接口 好让开发者有更多的扩展
 --]]
@@ -12,20 +14,121 @@ local class = import("..class");
 local Graphics = class();
 
 ---@param this Graphics
----@field public cmds string[]
 function Graphics.ctor(this)
-    this.cmds = {};
 end
 
+---@field public cmds CMD[]
+
 ---@param this Graphics
+---@return Graphics
 function Graphics.draw(this,...)
-    love.graphics.draw(...);
+    --love.graphics.draw(...);
+    this:pushCmd("draw",{...})
+    return this;
 end
 
 ---@param this Graphics
----@param text string
-function Graphics.print(this,text,...)
-    love.graphics.print(text,...)
+---@return Graphics
+function Graphics.circle(this,...)
+    --love.graphics.circle(...);
+    this:pushCmd("circle",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.arc(this,...)
+    this:pushCmd("arc",{...})
+    return this;
+end
+
+
+---@param this Graphics
+---@return Graphics
+function Graphics.ellipse(this,...)
+    this:pushCmd("ellipse",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.line(this,...)
+    this:pushCmd("line",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.points(this,...)
+    this:pushCmd("points",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.polygon(this,...)
+    this:pushCmd("polygon",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.printf(this,...)
+    this:pushCmd("printf",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.print(this,...)
+    this:pushCmd("print",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.quad(this,...)
+    this:pushCmd("quad",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.rectangle(this,...)
+    this:pushCmd("rectangle",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.stencil(this,...)
+    this:pushCmd("stencil",{...})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.triangle(this,...)
+    this:pushCmd("triangle",{...})
+    return this;
+end
+
+
+---@param this Graphics
+---@return Graphics
+function Graphics.clear(this,...)
+    this.cmds = nil;
+    return this;
+end
+
+---@param this Graphics
+---@param funcName string
+function Graphics.pushCmd(this, funcName,args)
+    if not this.cmds then
+        this.cmds = {};
+    end
+    table.insert(this.cmds,{cmd = funcName,args = args})
+    return this;
 end
 
 ---@param this Graphics
@@ -39,15 +142,27 @@ function Graphics._begin(this,x,y,r,w,h)
     love.graphics.translate(x,y);
     love.graphics.rotate(r);
     love.graphics.scale(w,h);
+    return this;
 end
 
+---@param this Graphics
+---@return Graphics
 function Graphics._render(this)
-    this:print("hello world!",0,0);
+    if not this.cmds then
+        return this;
+    end
+    for _, drawable in ipairs(this.cmds) do
+        love.graphics[drawable.cmd](unpack(drawable.args));
+    end
+    return this;
 end
 
+---@param this Graphics
 function Graphics._end(this)
     love.graphics.pop();
+    return this;
 end
+
 
 
 return Graphics;
