@@ -18,6 +18,7 @@ function Graphics.ctor(this)
 end
 
 ---@field public cmds CMD[]
+---@field public one CMD
 
 ---@param this Graphics
 ---@return Graphics
@@ -117,7 +118,7 @@ end
 ---@param this Graphics
 ---@return Graphics
 function Graphics.clear(this,...)
-    this.cmds = nil;
+    this.cmds = {};
     return this;
 end
 
@@ -148,11 +149,13 @@ end
 ---@param this Graphics
 ---@return Graphics
 function Graphics._render(this)
-    if not this.cmds then
-        return this;
+    if this.one then
+        love.graphics[this.one.cmd](unpack(this.one.args));
     end
-    for _, drawable in ipairs(this.cmds) do
-        love.graphics[drawable.cmd](unpack(drawable.args));
+    if this.cmds then
+        for _, drawable in ipairs(this.cmds) do
+            love.graphics[drawable.cmd](unpack(drawable.args));
+        end
     end
     return this;
 end

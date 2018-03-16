@@ -3,10 +3,8 @@
 --- DateTime: 2018/3/14 21:43
 ---
 local import = require("Import");
-local name = import("test",{"name"});
-print(name )
 local drawable = require("core.Drawable");
-
+local sprite = require("ui.Sprite")
 local utils = require("Utils");
 local Node = require("core.Node");
 
@@ -60,13 +58,17 @@ utils.tablePrint(n2);
 --utils.tablePrint(n1.components);
 --n3:addChild(n1);
 
-local spr = drawable.new();
+
+---@type Drawable
+local spr = sprite.new();
 local spr2 = drawable.new();
 spr:scale(2,1)
 spr2:addTo(spr)
 spr2:pos(50,50)
 spr2:scale(2,1)
 
+spr.graphics:print("2333",0,0)
+spr.graphics:clear()
 love.graphics.setBackgroundColor(0,0,0,255)
 function love.load()
     

@@ -81,6 +81,7 @@ function Drawable.size(this,w,h)
 end
 
 ---@param this Drawable
+---@return Drawable
 function Drawable._render(this)
     if not this.visible or this.destroyed or this.alpha == 0 or this.scaleY ==0 or this.scaleX == 0 then    -- 已经不会显示出来了
         return this;
@@ -92,6 +93,7 @@ function Drawable._render(this)
         end
     end
     this.graphics:_end();
+    return this;
 end
 
 return Drawable;
