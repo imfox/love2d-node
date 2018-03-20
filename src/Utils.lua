@@ -53,6 +53,13 @@ function Utils.splteText(str, mark)
     return {}
 end
 
+
+local gid = 0;
+-- 得到一个具有唯一性的ID
+function Utils.getGID()
+    gid = gid + 1;
+    return gid;
+end
+
+
 return Utils;
-
-

@@ -16,6 +16,7 @@ local Loader = class(Message);
 ---@param this Loader
 function Loader.ctor(this)
     this.loads = {};
+    this.images = {};
 end
 
 
@@ -41,7 +42,6 @@ function Loader.load(this,path,type,cache)
     if not this:isExist(path) then
         table.insert(this.loads,path)
     end
-
     return this;
 end
 
@@ -62,7 +62,11 @@ end
 ---@param this Loader
 ---@param skin string
 function Loader.getImage(this,skin)
-    return this.images and this.images[path] or nil;
+    if this.images[skin] == nil then
+        this.images[skin] = love.graphics.newImage(skin);
+    end
+    return this.images[skin];
 end
 
-return Loader;
+local loader  = Loader.new()
+return loader;

@@ -5,6 +5,7 @@
 local import = require("Import");
 local drawable = require("core.Drawable");
 local sprite = require("ui.Sprite")
+local label = require("ui.Label")
 local utils = require("Utils");
 local Node = require("core.Node");
 
@@ -61,11 +62,13 @@ utils.tablePrint(n2);
 
 ---@type Drawable
 local spr = sprite.new();
-local spr2 = drawable.new();
-spr:scale(2,1)
+local spr2 = label.new();
+spr.skin = "test.png";
+spr2.text = "23333";
+
+spr:pos(40,40)
 spr2:addTo(spr)
-spr2:pos(50,50)
-spr2:scale(2,1)
+spr2:pos(5,5)
 
 spr.graphics:print("2333",0,0)
 spr.graphics:clear()

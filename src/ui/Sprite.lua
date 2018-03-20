@@ -3,6 +3,10 @@
 --- DateTime: 2018/3/16 21:22
 ---
 local import = require("Import");
+
+---@type Loader
+local Loader = import("..core.Loader");
+
 local class = import("..class");
 
 ---@type AutoBitmap
@@ -18,6 +22,8 @@ local Sprite = class(Drawable)
 function Sprite.ctor(this)
     this.graphics = AutoBitmap.new();
     this.skin = "";
+
+
 end
 
 ---@field public graphics AutoBitmap
@@ -28,7 +34,9 @@ function Sprite._render(this)
     if not this.visible or this.destroyed or this.alpha == 0 or this.scaleY ==0 or this.scaleX == 0 then    -- 已经不会显示出来了
         return this;
     end
-    this.graphics.one = {cmd="print",args={"test string",0,0}};
+    if this.skin ~= nil and this.skin ~= "" then
+        this.graphics.one = {cmd="draw",args={Loader:getImage(this.skin),0,0,0,1,1,this.pivotX,this.pivotY}};
+    end
     this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY):_render();
     for _,drawable in ipairs(this.components) do
         if drawable._render then

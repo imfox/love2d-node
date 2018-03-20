@@ -2,18 +2,20 @@
 --- Created by fox.
 --- DateTime: 2018/3/15 20:45
 ---
-local function split(src, sep)
-    assert(type(src) == "string")
-    local sep, fields = sep or ":", {}
-    local pattern = string.format("([^%s]+)", sep)
-    src:gsub(
-    pattern,
-    function(c)
-        fields[#fields + 1] = c
-    end
-    )
-    return fields
-end
+--local function split(src, sep)
+--    assert(type(src) == "string")
+--    local sep, fields = sep or ":", {}
+--    local pattern = string.format("([^%s]+)", sep)
+--    src:gsub(
+--    pattern,
+--    function(c)
+--        fields[#fields + 1] = c
+--    end
+--    )
+--    return fields
+--end
+
+local Utils = require("Utils");
 
 --[[
     正确的使用方式应该是
@@ -51,7 +53,7 @@ local function import(moduleName, exprotArr)
                 local n, v = debug.getlocal(3, 1)
                 currentModuleName = v
             end
-            currentModuleNameParts = split(currentModuleName, ".")
+            currentModuleNameParts = Utils.splteText(currentModuleName, ".")
         end
         table.remove(currentModuleNameParts, #currentModuleNameParts)
     end
@@ -60,7 +62,7 @@ local function import(moduleName, exprotArr)
     end
     local module = require(moduleFullName);
     local export = {};
-    for _, k in pairs(exprotArr) do
+    for _, k in ipairs(exprotArr) do
         table.insert(export,module[k])
     end
     return unpack(export);

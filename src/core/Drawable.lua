@@ -5,6 +5,8 @@
 local import = require("Import");
 local class = import("..class");
 
+local Utils = require("Utils");
+
 ---@type Node
 local Node = import(".Node");
 
@@ -29,6 +31,7 @@ function Drawable.ctor(this)
     this.rotation = 0;
     this.visible = true;
     this.graphics = Graphics.new();
+    this.id = Utils.getGID();
 end
 
 ---@field public x number
