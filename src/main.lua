@@ -2,12 +2,14 @@
 --- Created by fox.
 --- DateTime: 2018/3/14 21:43
 ---
-local import = require("Import");
-local drawable = require("core.Drawable");
-local sprite = require("ui.Sprite")
-local label = require("ui.Label")
-local utils = require("Utils");
-local Node = require("core.Node");
+
+require("nodeFrame.engine");
+local drawable = require("nodeFrame.core.Display.Drawable");
+local sprite = require("nodeFrame.ui.Sprite")
+local label = require("nodeFrame.ui.Label")
+local utils = require("nodeFrame.core.Utils.Utils");
+local uiUtils = require("nodeFrame.core.Utils.UiUtils");
+local Node = require("nodeFrame.core.Display.Node");
 
 local n1 = Node.new();
 n1.name = "n1";
@@ -33,9 +35,9 @@ n1:addChild(n4)
 --n5:addChild(n6)
 --n5:addChild(n7)
 --n5:addChild(n8)
-utils.tablePrint(n1.components);
+--utils.tablePrint(n1.components);
 n1:destroy(false)
-utils.tablePrint(n2);
+--utils.tablePrint(n2);
 
 
 --n5:addChild(n2)
@@ -62,16 +64,10 @@ utils.tablePrint(n2);
 
 ---@type Drawable
 local spr = sprite.new();
-local spr2 = label.new();
-spr.skin = "test.png";
-spr2.text = "23333";
+local uiData = require("uiscripts.Test")
+local test = uiUtils.createByTable(uiData,nil,spr)
+test:addTo(spr);
 
-spr:pos(40,40)
-spr2:addTo(spr)
-spr2:pos(5,5)
-
-spr.graphics:print("2333",0,0)
-spr.graphics:clear()
 love.graphics.setBackgroundColor(0,0,0,255)
 function love.load()
     
