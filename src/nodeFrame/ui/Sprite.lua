@@ -78,18 +78,16 @@ function Sprite._render(this)
         end
         if this.parent then
             if this.left ~= nil then
-                this.pivotX = 0;    -- 这一行为了兼容laya...
-                this.x = -(this.parent.pivotX or 0) + this.pivotX + this.left;
+                this.x = this.left + this.pivotX;
             end
             if this.top ~= nil then
-                this.pivotY = 0;    -- 这一行为了兼容laya...
-                this.y = -(this.parent.pivotY or 0) + this.pivotY + this.top;
+                this.y =  this.top + this.pivotY;
             end
             if this.right ~= nil then
-                this.width = this.parent.width - (this.parent.pivotX-this.pivotX+this.x) - this.right;
+                this.width = this.parent.width - (this.x-this.pivotX) - this.right;
             end
             if this.bottom ~= nil then
-                this.height = this.parent.height - (this.parent.pivotY-this.pivotY+this.y) - this.bottom;
+                this.height = this.parent.height - (this.y-this.pivotY) - this.bottom;
             end
        end
 
@@ -130,6 +128,7 @@ function Sprite._render(this)
 
 
     this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY):_render();
+    this.graphics:translate(-this.pivotX,-this.pivotY)
     for _,drawable in ipairs(this.components) do
         if drawable._render then
             drawable:_render()
