@@ -140,7 +140,7 @@ end
 function Graphics._begin(this,x,y,r,w,h)
     love.graphics.push()
     love.graphics.translate(x,y);
-    love.graphics.rotate(r);
+    love.graphics.rotate(math.rad(r));
     love.graphics.scale(w,h);
     return this;
 end
