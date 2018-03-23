@@ -106,6 +106,19 @@ function Node.removeSelf(this)
     return this;
 end
 
+---@return Node
+---@param this Node
+---@param begin number
+---@param endl number
+function Node.removeChildren(this,begin,endl)
+    begin = begin or 1;
+    endl = endl or this:numChild();
+    for i = 0, math.min(endl-begin,0) do
+        this:removeChildAt(begin);
+    end
+    return this;
+end
+
 ---@param this Node
 ---@param parent Node
 ---@return Node
