@@ -21,14 +21,18 @@ local Component = class(Drawable);
 ---@param this Component
 function Component.ctor(this)
     --[[
-        以下的属性需要优先于 pivotX,pivotY,x,y,width,height ,但是仍需计算出相对的值 以便用户的操作
+        使用以下属性将会无视 pivotX,pivotY
     --]]
     this.anchorX = 0;
     this.anchorY = 0;
-    this.top = 0;
-    this.bottom = 0;
-    this.left = 0;
-    this.right = 0;
+
+    --[[
+       使用以下属性将会无视 scalexX、scaleY、x、width、height、anchorX、anchorY、pivotX,pivotY
+   --]]
+    this.top = nil;
+    this.bottom = nil;
+    this.left = nil;
+    this.right = nil;
 
 
     this.tag = nil;

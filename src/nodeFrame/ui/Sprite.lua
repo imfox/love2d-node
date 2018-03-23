@@ -47,6 +47,7 @@ function Sprite.ctor(this)
 end
 
 ---@field public graphics AutoBitmap
+---@field public parent Drawable
 
 ---@param this Sprite
 ---@return Sprite
@@ -75,12 +76,28 @@ function Sprite._render(this)
         if this.anchorY ~= 0 and this.anchorY ~= nil then
             this.pivotY = this.height * this.anchorY;
         end
+        if this.parent then
+            if this.left ~= nil then
+                this.pivotX = 0;
+                this.x = -(this.parent.pivotX or 0) + this.pivotX + this.left;
+            end
+            if this.top ~= nil then
+                this.pivotY = 0;
+                this.y = -(this.parent.pivotY or 0) + this.pivotY + this.top;
+            end
+            if this.right ~= nil then
+                this.width = this.parent.width - (this.parent.pivotX-this.pivotX+this.x) - this.right;
+            end
+            if this.bottom ~= nil then
+                this.height = this.parent.height - (this.parent.pivotY-this.pivotY+this.y) - this.bottom;
+            end
+       end
+
 
         if this.sizeGrid == nil or this.sizeGrid == "" then
             local sx = this.width / width;
             local sy = this.height / height;
-
-            this.graphics:draw(img,0,0,0,sx,sy,this.pivotX,this.pivotY)
+            this.graphics:draw(img,0,0,0,sx,sy,this.pivotX/sx,this.pivotY/sy)
         else
             local grids =  Utils.splteText(this.sizeGrid,",");
             this:__setGrid(unpack(grids));
