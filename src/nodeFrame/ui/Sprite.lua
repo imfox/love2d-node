@@ -78,11 +78,11 @@ function Sprite._render(this)
         end
         if this.parent then
             if this.left ~= nil then
-                this.pivotX = 0;
+                this.pivotX = 0;    -- 这一行为了兼容laya...
                 this.x = -(this.parent.pivotX or 0) + this.pivotX + this.left;
             end
             if this.top ~= nil then
-                this.pivotY = 0;
+                this.pivotY = 0;    -- 这一行为了兼容laya...
                 this.y = -(this.parent.pivotY or 0) + this.pivotY + this.top;
             end
             if this.right ~= nil then
