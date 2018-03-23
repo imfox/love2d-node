@@ -165,6 +165,29 @@ function Graphics._end(this)
     return this;
 end
 
+---@param this Graphics
+---@return Graphics
+---@param x number
+---@param y number
+function Graphics.translate(this,x,y)
+    love.graphics.translate(x,y)
+    return this;
+end
+---@param this Graphics
+---@return Graphics
+---@param r number
+function Graphics.rotate(this,r)
+    love.graphics.rotate(r)
+    return this;
+end
 
+---@param this Graphics
+---@return Graphics
+---@param x number
+---@param y number
+function Graphics.scale(this,x,y)
+    love.graphics.sclae(x,y)
+    return this;
+end
 
 return Graphics;
