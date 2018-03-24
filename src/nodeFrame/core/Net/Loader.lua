@@ -62,7 +62,7 @@ end
 ---@param skin string
 ---@return Image
 function Loader.getImage(this,skin)
-    if skin == "" or skin == nil then
+    if skin == "" or skin == nil or not love.filesystem.exists(skin) then
         return nil;
     end
     if this.images[skin] == nil then

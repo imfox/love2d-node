@@ -5,7 +5,6 @@
 local class = require("nodeFrame.class");
 
 
-
 --[[
     实际上这里应该放出接口 好让开发者有更多的扩展
 --]]
@@ -103,6 +102,12 @@ end
 ---@return Graphics
 function Graphics.stencil(this,...)
     this:pushCmd("stencil",{...})
+    return this;
+end
+
+---@param this Graphics
+function Graphics.setShader(this,...)
+    this:pushCmd("setShader",{...})
     return this;
 end
 

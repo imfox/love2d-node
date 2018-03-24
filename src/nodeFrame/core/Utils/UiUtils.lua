@@ -32,7 +32,7 @@ function Utils.createByTable(table,node,root)
 
     local props = table.props;
     if not node then
-        print(table.type)
+        --print(table.type)
         node = Utils.getInstance(table.type);
     end
 

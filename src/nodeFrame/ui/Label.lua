@@ -14,12 +14,12 @@ local class = require("nodeFrame.class");
 ---@type AutoBitmap
 local AutoBitmap = require("nodeFrame.ui.AutoBitmap")
 
----@type Drawable
-local Drawable = require("nodeFrame.core.Display.Drawable")
+---@type Component
+local Component = require("nodeFrame.ui.Component")
 
 local Utils = require("nodeFrame.core.Utils.Utils")
----@class Label : Drawable
-local Label = class(Drawable)
+---@class Label : Component
+local Label = class(Component)
 
 ---@param this Label
 function Label.ctor(this)
@@ -45,18 +45,32 @@ function Label._render(this)
     if this.anchorY ~= 0 and this.anchorY ~= nil then
         this.pivotY = this.height * this.anchorY;
     end
+    if this.parent then
+        if this.left ~= nil then
+            this.x = this.left + this.pivotX;
+        end
+        if this.top ~= nil then
+            this.y =  this.top + this.pivotY;
+        end
+        if this.right ~= nil then
+            this.width = this.parent.width - (this.x-this.pivotX) - this.right;
+        end
+        if this.bottom ~= nil then
+            this.height = this.parent.height - (this.y-this.pivotY) - this.bottom;
+        end
+    end
 
     local x,y = 0,0;
     if this.valign == "middle" or this.valign  == "bottom" then
         local h = this.height - love.graphics.getFont():getHeight() * #(Utils.splteText(this.text,"\n"));
-        y =  h/(this.valign=="middle"and 2 or 1);
+        y =  h / (this.valign=="middle"and 2 or 1);
         if y < 0 then
             y = 0
         end
     end
-
     this.graphics.one = {cmd="printf",args={this.text,x,y,this.width,this.align,0,1,1,this.pivotX,this.pivotY}};
     this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY):_render();
+    this.graphics:translate(-this.pivotX,-this.pivotY)
     for _,drawable in ipairs(this.components) do
         if drawable._render then
             drawable:_render()

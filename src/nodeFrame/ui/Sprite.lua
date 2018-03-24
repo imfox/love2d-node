@@ -9,6 +9,7 @@ local Loader = require("nodeFrame.core.Net.Loader");
 local class = require("nodeFrame.class");
 
 local Utils = require("nodeFrame.core.Utils.Utils")
+local Constant = require("nodeFrame.core.Utils.Constant")
 ---@type AutoBitmap
 local AutoBitmap = require("nodeFrame.ui.AutoBitmap")
 
@@ -127,12 +128,22 @@ function Sprite._render(this)
     end
 
 
-    this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY):_render();
+    this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY)
+    if this.gray or this.disabled then
+        this.graphics:setShader(Constant.grayShader)
+    end
+
+    this.graphics:_render();
     this.graphics:translate(-this.pivotX,-this.pivotY)
+
     for _,drawable in ipairs(this.components) do
         if drawable._render then
             drawable:_render()
         end
+    end
+    --this.graphics:setShader(nil)
+    if this.gray or this.disabled then
+        love.graphics.setShader()
     end
     this.graphics:_end();
     return this;
