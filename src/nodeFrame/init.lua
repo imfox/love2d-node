@@ -24,6 +24,21 @@ local Ease = require("nodeFrame.core.Utils.Ease");
 local Label = require("nodeFrame.ui.Label");
 local Sprite = require("nodeFrame.ui.Sprite");
 
+local stage = Drawable.new();
+
+
+
+local sclaeX, sclaeY = 1, 1
+local offsetX, offsetY = 0, 0
+local function resize( w, h)
+    local minScale = math.min(w / stage.width, h / stage.height)
+    sclaeX, sclaeY = minScale, minScale
+    offsetX, offsetY = (w - (stage.width * sclaeX)) / 2, (h - (stage.height * sclaeY)) / 2;
+end
+
+local function load( )
+
+end
 
 local function update(dt)
     Timer._updateAll(dt);
@@ -31,9 +46,10 @@ local function update(dt)
 end
 
 local function draw()
-end
-
-local function resize( w, h)
+    love.graphics.push()
+    love.graphics.scale(sclaeX,sclaeY)
+    stage:_render()
+    love.graphics.pop()
 end
 
 local function wheelmoved( x, y )
@@ -76,10 +92,11 @@ local export = {
     Sprite = Sprite,
 
     --@public
-    stage = nil,
+    stage = stage,
 
     --@public
     register = nil,
+    load = load,
     update = update,
     draw = draw,
     focus = focus,
@@ -96,8 +113,15 @@ local export = {
 
 }
 
+local function init(title,width,height)
+    stage.width = width;
+    stage.height = height;
+    resize(love.graphics.getWidth(),love.graphics.getHeight())
+    return export;
+end
+
 local function register()
-    local funcs = {"update","draw","focus","resize","keypressed","keyreleased","mousemoved","mousepressed","mousereleased","touchmoved","touchreleased","touchpressed","wheelmoved"};
+    local funcs = {"load","update","draw","focus","resize","keypressed","keyreleased","mousemoved","mousepressed","mousereleased","touchmoved","touchreleased","touchpressed","wheelmoved"};
     for _, name in pairs(funcs) do
         love[name] = export[name];
     end
@@ -106,4 +130,4 @@ end
 
 export.register = register;
 
-return export;
+return init;
