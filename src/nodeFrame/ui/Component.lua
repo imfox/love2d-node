@@ -20,6 +20,7 @@ local Component = class(Drawable);
 
 ---@param this Component
 function Component.ctor(this)
+    this:super()
     --[[
         使用以下属性将会无视 pivotX,pivotY
     --]]

@@ -14,6 +14,7 @@ local Loader = class(Message);
 
 ---@param this Loader
 function Loader.ctor(this)
+    this:super()
     this.loads = {};
     this.images = {};
 end

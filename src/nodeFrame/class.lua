@@ -1,64 +1,47 @@
-local _class = {}
---保存父类
-local create
-create = function(ctor, ct, ...)
-    if #ct.super > 0 then --继承属性
-        for i, v in ipairs(ct.super) do
-            create(ctor, v, ...)
-        end
-    end
-    if ct.ctor then
-        ct.ctor(ctor, ...)
-    end
-end
-local function super(self, id, name, ...) --__super
-    if type(id) == "number" then
-        if _class[self.super[id]] and _class[self.super[id]][name] then
-            return _class[self.super[id]][name](self, ...)
-        end
-    else
-        if _class[id] and _class[id][name] then
-            return _class[id][name](self, ...)
-        end
-    end
-end
-local function class(...)
-    local class_type = {}
-    --new的对象
-    class_type.super = {...}
-    class_type.ctor = false
-    class_type.new = function(...)
-        local ctor = {}
-        setmetatable(ctor, {__index = _class[class_type]})
-        --继承类属性和函数
-        create(ctor, class_type, ...)
-        --递归所有父类
-        return ctor
-    end
-    _class[class_type] = {CALL = super}
-    --类函数实际保存
-    local mt = {}
-    mt.__newindex = _class[class_type]
-    mt.__call = function(t, ...)
-        return t.new(...)
-    end
-    setmetatable(class_type, mt)
+local Utils = require("nodeFrame.core.Utils.Utils");
+--Create an class.
+local function class(super)
+    local superType = type(super)
+    local cls
 
-    if #class_type.super > 0 then --继承函数
-        setmetatable(
-            _class[class_type],
-            {
-                __index = function(t, k)
-                    for i, v in ipairs(class_type.super) do
-                        local ret = _class[v][k]
-                        if ret then
-                            return ret
-                        end
-                    end
-                end
-            }
-        )
+    if superType ~= "function" and superType ~= "table" then
+        super = nil
     end
-    return class_type
+
+    -- inherited from Lua Object
+    if super then
+        cls = Utils.tableClone(super)
+        if super.ctor then
+            cls.__super = cls.__super or {}
+            table.insert(cls.__super, cls.ctor)
+        end
+        cls.ctor = nil
+    else
+        cls = {}
+    end
+    cls.__index = cls
+
+    function cls.new(...)
+        local instance = setmetatable({}, cls)
+        instance.super = cls.__super == nil and nil or function(...)
+            -- local info = debug.getinfo(2, "n")
+            -- if (info.name ~= nil and info.name ~= "super" and info.name ~= "ctor") then
+            --     error(
+            --         "Super calls are not permitted outside constructors or in nested functions inside constructors.."
+            --     )
+            -- end
+            instance._super_init_count_ = (instance._super_init_count_ or #cls.__super+1)-1
+            cls.__super[instance._super_init_count_](...)
+        end
+        if instance.ctor then
+            instance:ctor(...)
+        end
+        if cls.__super and instance._super_init_count_ ~= 1 then
+            error("Constructors for derived classes must contain a 'super' call.")
+        end
+        return instance
+    end
+
+    return cls
 end
 return class;

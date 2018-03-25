@@ -23,7 +23,8 @@ local Label = class(Component)
 
 ---@param this Label
 function Label.ctor(this)
-    this.graphics = AutoBitmap.new();
+    this:super()
+    --this.graphics = AutoBitmap.new();
     this.text = "";
     this.align = "left";
     this.valign = "top";

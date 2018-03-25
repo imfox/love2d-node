@@ -43,6 +43,7 @@ local Sprite = class(Component)
 ---@param this Sprite
 function Sprite.ctor(this)
     --this.graphics = AutoBitmap.new();
+    this:super()
     this.skin = nil;
     this.sizeGrid = "";
 end
@@ -132,7 +133,6 @@ function Sprite._render(this)
     if this.gray or this.disabled then
         this.graphics:setShader(Constant.grayShader)
     end
-
     this.graphics:_render();
     this.graphics:translate(-this.pivotX,-this.pivotY)
 
@@ -141,7 +141,6 @@ function Sprite._render(this)
             drawable:_render()
         end
     end
-    --this.graphics:setShader(nil)
     if this.gray or this.disabled then
         love.graphics.setShader()
     end

@@ -18,6 +18,7 @@ local Drawable = class(Node);
 
 ---@param this Drawable
 function Drawable.ctor(this)
+    this:super()
     this.x = 0;
     this.y = 0;
     this.scaleX = 1;
