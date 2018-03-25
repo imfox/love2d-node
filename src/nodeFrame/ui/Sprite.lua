@@ -41,10 +41,11 @@ end
 local Sprite = class(Component)
 
 ---@param this Sprite
-function Sprite.ctor(this)
+---@param skin string
+function Sprite.ctor(this,skin)
     --this.graphics = AutoBitmap.new();
     this:super()
-    this.skin = nil;
+    this.skin = skin;
     this.sizeGrid = "";
 end
 
