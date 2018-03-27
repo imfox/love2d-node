@@ -32,6 +32,23 @@ function Drawable.ctor(this)
     this.visible = true;
     this.graphics = Graphics.new();
     this.id =  Utils.getGID();
+
+    this.mouseEnabled = false;
+end
+
+---@param this Drawable
+---@param type string
+function Drawable.on(this,type,...)
+    if type == "MOUSE_DOWN" or type == "MOUSE_MOVE" or type == "MOUSE_UP" or type == "CLICK" then
+        this.mouseEnabled = true;
+        local parent = this
+        while parent do -- 开启全部父节点可以点击
+            parent.mouseEnabled = true;
+            parent = parent.parent
+        end
+    end
+    this:call("on",type,...)
+    return this
 end
 
 ---@field public x number
