@@ -10,11 +10,12 @@ local class = require("nodeFrame.class");
 
 local Utils = require("nodeFrame.core.Utils.Utils")
 local Constant = require("nodeFrame.core.Utils.Constant")
----@type AutoBitmap
-local AutoBitmap = require("nodeFrame.ui.AutoBitmap")
 
 ---@type Component
 local Component = require("nodeFrame.ui.Component")
+
+
+local newQuad_,setShader,translate,scale,draw,pop,push,rotate = love.graphics.newQuad,love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate
 
 ---newQuad
 ---@param quad Quad
@@ -30,7 +31,7 @@ local function newQuad(quad, x, y, w, h, width, height)
         return nil
     end
     if quad == nil then
-        quad = love.graphics.newQuad(x, y, w, h, width, height)
+        quad = newQuad_(x, y, w, h, width, height)
     else
         quad:setViewport(x, y, w, h)
     end
@@ -59,9 +60,15 @@ function Sprite._render(this)
         return this;
     end
 
+    push()
+    translate(this.x,this.y)
+    scale(this.scaleX,this.scaleY)
+    rotate(math.rad(this.rotation))
+    if this.gray or this.disabled then
+        setShader(Constant.grayShader)
+    end
+
     if Loader:getImage(this.skin) ~= nil then
-
-
         this.graphics:clear();
 
         ---@type Image
@@ -98,7 +105,7 @@ function Sprite._render(this)
         if this.sizeGrid == nil or this.sizeGrid == "" then
             local sx = this.width / width;
             local sy = this.height / height;
-            this.graphics:draw(img,0,0,0,sx,sy,this.pivotX/sx,this.pivotY/sy)
+            draw(img,0,0,0,sx,sy,this.pivotX/sx,this.pivotY/sy)
         else
             local grids =  Utils.splteText(this.sizeGrid,",");
             this:__setGrid(unpack(grids));
@@ -110,11 +117,11 @@ function Sprite._render(this)
             local scaleYGroup = {1, (this.height - this._grid[2] - this._grid[4]) / gridCenterHeight, 1}
             local xGroup = {0, this._grid[1], this.width - this._grid[3]}
             local yGroup = {this.height - this._grid[4], this._grid[2], 0}
-            local j = 1
             for i = 1, 3 do
                 for n = 1, 3 do
+                    local j = (i-1) * 3 + n
                     if (this._grid_quad[j]) then
-                        this.graphics:draw(
+                        draw(
                         img,
                         this._grid_quad[j],
                         (-(this.pivotX * this.scaleX) + (xGroup[n] * this.scaleX)),
@@ -123,19 +130,13 @@ function Sprite._render(this)
                         this.scaleX * scaleXGroup[n],
                         this.scaleY * scaleYGroup[i])
                     end
-                    j = j + 1
                 end
             end
         end
     end
 
-
-    this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY)
-    if this.gray or this.disabled then
-        this.graphics:setShader(Constant.grayShader)
-    end
     this.graphics:_render();
-    this.graphics:translate(-this.pivotX,-this.pivotY)
+    translate(-this.pivotX,-this.pivotY)
 
     for _,drawable in ipairs(this.components) do
         if drawable._render then
@@ -143,9 +144,9 @@ function Sprite._render(this)
         end
     end
     if this.gray or this.disabled then
-        love.graphics.setShader()
+        setShader()
     end
-    this.graphics:_end();
+    pop()
     return this;
 end
 

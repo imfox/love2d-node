@@ -1,47 +1,58 @@
 local Utils = require("nodeFrame.core.Utils.Utils");
 --Create an class.
 local function class(super)
-    local superType = type(super)
-    local cls
-
-    if superType ~= "function" and superType ~= "table" then
-        super = nil
-    end
-
-    -- inherited from Lua Object
+    local cls = {};
+    cls.__base = {};
     if super then
-        cls = Utils.tableClone(super)
-        if super.ctor then
-            cls.__super = cls.__super or {}
-            table.insert(cls.__super, cls.ctor)
+        for _,base in ipairs(super.__base) do
+            table.insert(cls.__base,base)
         end
-        cls.ctor = nil
-    else
-        cls = {}
+        table.insert(cls.__base,super)
     end
-    cls.__index = cls
+    cls._index = #cls.__base
+    cls.new = function(...)
+        local instance
+        instance = setmetatable({_index = cls._index,__base ={}} , {__index = function(t,k)
+            for i=#t.__base,1,-1 do
+                if t.__base[i][k] then
+                    return t.__base[i][k]
+                end
+            end
+        end})
 
-    function cls.new(...)
-        local instance = setmetatable({}, cls)
-        instance.super = cls.__super == nil and nil or function(...)
-            -- local info = debug.getinfo(2, "n")
-            -- if (info.name ~= nil and info.name ~= "super" and info.name ~= "ctor") then
-            --     error(
-            --         "Super calls are not permitted outside constructors or in nested functions inside constructors.."
-            --     )
-            -- end
-            instance._super_init_count_ = (instance._super_init_count_ or #cls.__super+1)-1
-            cls.__super[instance._super_init_count_](...)
+        for _,base in ipairs(cls.__base) do
+            table.insert(instance.__base,base)
         end
-        if instance.ctor then
-            instance:ctor(...)
+        table.insert(instance.__base,cls)
+
+        if #instance.__base > 0 then
+            instance.super = function(this,...)
+                local o = this.__base[this._index];
+                local index =  this._index;
+                this._index = index - 1;
+                o.ctor(this,...)
+                this._index = index
+            end
+            instance.call = function(this,f,...)
+                local index = this._index;
+                for i=index,1,-1 do
+                    local base = this.__base[i];
+                    if base[f] then
+                        this._index = i-1
+                        base[f](this,...)
+                        this._index = index
+                        return
+                    end
+                end
+                error("Property '"..f.."' does not exist on 'super'.")
+            end
         end
-        if cls.__super and instance._super_init_count_ ~= 1 then
-            error("Constructors for derived classes must contain a 'super' call.")
+
+        if cls.ctor then
+            cls.ctor(instance,...)
         end
-        return instance
+        return instance;
     end
-
     return cls
 end
 return class;

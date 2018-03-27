@@ -22,7 +22,7 @@ local Tween = require("nodeFrame.core.Utils.Tween");
 local Ease = require("nodeFrame.core.Utils.Ease");
 
 local Label = require("nodeFrame.ui.Label");
-local Sprite = require("nodeFrame.ui.Sprite");
+local Sprite = require("nodeFrame.ui.Image");
 
 local stage = Drawable.new();
 

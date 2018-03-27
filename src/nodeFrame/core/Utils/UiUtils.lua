@@ -4,7 +4,7 @@
 ---
 
 local Node = require("nodeFrame.core.Display.Drawable");
-local Image = require("nodeFrame.ui.Sprite");
+local Image = require("nodeFrame.ui.Image");
 local Label = require("nodeFrame.ui.Label");
 local Utils = {};
 
