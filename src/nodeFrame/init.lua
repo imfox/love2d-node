@@ -24,7 +24,8 @@ local Ease = require("nodeFrame.core.Utils.Ease");
 local Label = require("nodeFrame.ui.Label");
 local Sprite = require("nodeFrame.ui.Image");
 
-local stage = Drawable.new();
+local Stage = require("nodeFrame.core.Display.Stage")
+local stage = Stage.new();
 
 
 
@@ -49,7 +50,7 @@ local function draw()
     love.graphics.push()
     love.graphics.translate(offsetX, offsetY)
     love.graphics.scale(sclaeX,sclaeY)
-    stage:_render()
+    stage:draw()
     love.graphics.pop()
     love.graphics.setShader(unpack({}))
 end
