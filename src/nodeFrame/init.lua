@@ -33,7 +33,7 @@ local offsetX, offsetY = 0, 0
 local function resize( w, h)
     local minScale = math.min(w / stage.width, h / stage.height)
     sclaeX, sclaeY = minScale, minScale
-    offsetX, offsetY = (w - (stage.width * sclaeX)) / 2, (h - (stage.height * sclaeY)) / 2;
+    offsetX, offsetY = (w - (stage.width * minScale)) / 2, (h - (stage.height * minScale)) / 2;
 end
 
 local function load( )
@@ -47,6 +47,7 @@ end
 
 local function draw()
     love.graphics.push()
+    love.graphics.translate(offsetX, offsetY)
     love.graphics.scale(sclaeX,sclaeY)
     stage:_render()
     love.graphics.pop()
