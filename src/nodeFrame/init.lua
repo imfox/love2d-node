@@ -50,6 +50,7 @@ local function draw()
     love.graphics.scale(sclaeX,sclaeY)
     stage:_render()
     love.graphics.pop()
+    love.graphics.setShader(unpack({}))
 end
 
 local function wheelmoved( x, y )
