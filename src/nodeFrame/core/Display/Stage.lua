@@ -5,34 +5,31 @@
 local class = require("nodeFrame.class")
 
 local Drawable = require("nodeFrame.core.Display.Drawable");
+local Utils = require("nodeFrame.core.Utils.Utils");
+local Math = require("nodeFrame.core.Math.Math")
 
-function PointHitRect(x1,y1,x0,y0,w0,h0)
-    return x1 >= x0 and x1 <= x0 + w0 and y1>=y0 and y1 < y0 + h0
-end
-
-
+local rx = {}
+local px = 0
+local py = 0
 ---@param draw Drawable
 ---@param x number
 ---@param y number
 ---@return Drawable
-local function testPoint(draw,x,y)
+local function HitObject(draw,x,y)
     if not draw.visible or draw.destroyed or not draw.mouseEnabled then
         return false
     end
 
-    local _x,_y ,_w,_h= 0,0,0,0
-    _x = draw.x - draw.pivotX
-    _y = draw.y - draw.pivotY
-    _w = draw.width * draw.scaleX
-    _h = draw.height * draw.scaleY
+    local nx,ny = x-draw.x,y-draw.y
+    local tx,ty = Math.rotatePointByZero(nx,ny,-draw.rotation)
 
     local hit = false
-    if(PointHitRect(x,y,_x,_y ,_w,_h))then
+    if(Utils.pointHitRect(tx,ty,-draw.pivotX,-draw.pivotY,draw.width,draw.height))then
         hit = draw
         if draw.components then
             for i = draw:numChild(),1,-1 do
                 local child = draw:getChildAt(i);
-                local h = testPoint(child,x - _x,y - _y)
+                local h = HitObject(child,tx,ty)
                 if h then
                     hit = h
                     break
@@ -55,9 +52,8 @@ function stage.ctor(this)
     local pressNode
 
     local function mouseEvent(type,x,y)
-        local hit = testPoint(this,x,y)
-
-        if hit then
+        local hit = HitObject(this,x,y)
+        if hit and hit.name ~= "Stage" then
             if type == "MOUSE_DOWN" then
                 pressNode = hit
             end
