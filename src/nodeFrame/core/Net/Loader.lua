@@ -17,6 +17,7 @@ function Loader.ctor(this)
     this:super()
     this.loads = {};
     this.images = {};
+    this.fonts = {};
 end
 
 
@@ -71,6 +72,21 @@ function Loader.getImage(this,skin)
     end
     return this.images[skin];
 end
+
+
+---@param this Loader
+---@param path string
+---@return Font
+function Loader.getFont(this, path)
+    if path == "" or path == nil or not love.filesystem.exists(path) then
+        return nil;
+    end
+    if this.fonts[path] == nil then
+        this.fonts[path] = love.graphics.newFont(path);
+    end
+    return this.fonts[path];
+end
+
 
 local loader  = Loader.new()
 return loader;
