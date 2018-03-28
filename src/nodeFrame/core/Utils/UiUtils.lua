@@ -3,9 +3,10 @@
 --- DateTime: 2018/3/21 0:08
 ---
 
-local Node = require("nodeFrame.core.Display.Drawable");
+local Drawable = require("nodeFrame.core.Display.Drawable");
 local Image = require("nodeFrame.ui.Image");
 local Label = require("nodeFrame.ui.Label");
+local ScaleButton = require("nodeFrame.ui.ScaleButton");
 local Utils = {};
 
 
@@ -15,8 +16,10 @@ function Utils.getInstance(className)
         return Image.new();
     elseif className == "Label" then
         return Label.new();
+    elseif className == "ScaleButton" then
+        return ScaleButton.new();
     else
-        return Node.new()
+        return Drawable.new()
     end
 end
 
