@@ -100,6 +100,21 @@ function Drawable.size(this,w,h)
     return this;
 end
 
+
+---@param this Drawable
+---@param x number
+---@param y number
+function Drawable.localToGlobal(this,x,y)
+    return x,y;
+end
+
+---@param this Drawable
+---@param x number
+---@param y number
+function Drawable.globalToLocal(this,x,y)
+    return x,y;
+end
+
 ---@param this Drawable
 ---@return Drawable
 function Drawable._render(this)
