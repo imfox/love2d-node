@@ -78,6 +78,28 @@ function Utils.splteText(str, mark)
 end
 
 
+
+-- 点与四边形碰撞
+function Utils.pointHitQuad(x, y, lt--[[ {x,y} --]], lb--[[ {x,y} --]], rt--[[ {x,y} --]], rb--[[ {x,y} --]])
+    local a = (lt.x - lb.x) * (y - lb.y) - (lt.y - lb.y) * (x - lb.x);
+    local b = (rt.x - lt.x) * (y - lt.y) - (rt.y - lt.y) * (x - lt.x);
+    local c = (rb.x - rt.x) * (y - rt.y) - (rb.y - rt.y) * (x - rt.x);
+    local d = (lb.x - rb.x) * (y - rb.y) - (lb.y - rb.y) * (x - rb.x);
+    if ((a > 0 and b > 0 and c > 0 and d > 0) or (a < 0 and b < 0 and c < 0 and d < 0)) then
+        return true;
+    end
+    return false;
+end
+
+function Utils.pointHitRect(x1,y1,x0,y0,w0,h0)
+    return x1 >= x0 and x1 <= x0 + w0 and y1>=y0 and y1 < y0 + h0
+end
+
+function Utils.newPoint(x,y)
+    return {x=x,y=y};
+end
+
+
 local gid = 0;
 -- 得到一个具有唯一性的ID
 function Utils.getGID()
