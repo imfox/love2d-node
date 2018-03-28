@@ -37,6 +37,27 @@ local function resize( w, h)
     offsetX, offsetY = (w - (stage.width * minScale)) / 2, (h - (stage.height * minScale)) / 2;
 end
 
+local function touchPoint(x, y)
+    x = x - offsetX
+    x = x / (sclaeX * stage.width) * stage.width
+    if (x < 0) then
+        x = 0
+    end
+    if (x > stage.width) then
+        x = stage.width
+    end
+
+    y = y - offsetY
+    y = y / (sclaeY * stage.height) * stage.height
+    if (y < 0) then
+        y = 0
+    end
+    if (y > stage.height) then
+        y = stage.height
+    end
+    return x, y
+end
+
 local function load( )
 
 end
@@ -55,21 +76,33 @@ local function draw()
     love.graphics.setShader(unpack({}))
 end
 
+local function mouseEvent(type,x,y)
+    local _x,_y = touchPoint(x,y)
+    stage:event(type,{type,_x,_y})
+end
+
 local function wheelmoved( x, y )
 end
 
+
 local function touchmoved( id, x, y, dx, dy, pressure )
+    mouseEvent("MOUSE_MOVE",x,y)
 end
 local function touchpressed( id, x, y, dx, dy, pressure )
+    mouseEvent("MOUSE_DOWN",x,y)
 end
 local function touchreleased( id, x, y, dx, dy, pressure )
+    mouseEvent("MOUSE_UP",x,y)
 end
 
 local function mousereleased(x, y, button, istouch)
+    mouseEvent("MOUSE_UP",x,y)
 end
 local function mousepressed(x, y, button, istouch)
+    mouseEvent("MOUSE_DOWN",x,y)
 end
 local function mousemoved( x, y, dx, dy, istouch)
+    mouseEvent("MOUSE_MOVE",x,y)
 end
 
 local function keypressed(key, scancode, isrepeat)
@@ -124,7 +157,17 @@ local function init(title,width,height)
 end
 
 local function register()
-    local funcs = {"load","update","draw","focus","resize","keypressed","keyreleased","mousemoved","mousepressed","mousereleased","touchmoved","touchreleased","touchpressed","wheelmoved"};
+    local funcs = {"load","update","draw","focus","resize","keypressed","keyreleased","wheelmoved"};
+
+    local touchFuncs = {"touchmoved","touchreleased","touchpressed"};
+    local system = string.lower(love.system.getOS());
+    if system == "windows" or system == "linux" then
+        touchFuncs = {"mousemoved","mousepressed","mousereleased"}
+    end
+
+    for _, name in pairs(touchFuncs) do
+        love[name] = export[name];
+    end
     for _, name in pairs(funcs) do
         love[name] = export[name];
     end
