@@ -11,13 +11,14 @@ local Loader = require("nodeFrame.core.Net.Loader");
 
 local class = require("nodeFrame.class");
 
----@type AutoBitmap
-local AutoBitmap = require("nodeFrame.ui.AutoBitmap")
-
 ---@type Component
 local Component = require("nodeFrame.ui.Component")
 
 local Utils = require("nodeFrame.core.Utils.Utils")
+
+local setShader,translate,scale,printf,pop,push,rotate = love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.printf,love.graphics.pop,love.graphics.push,love.graphics.rotate
+
+
 ---@class Label : Component
 local Label = class(Component)
 
@@ -38,6 +39,14 @@ end
 function Label._render(this)
     if not this.visible or this.destroyed or this.alpha == 0 or this.scaleY ==0 or this.scaleX == 0 then    -- 已经不会显示出来了
         return this;
+    end
+
+    push()
+    translate(this.x,this.y)
+    scale(this.scaleX,this.scaleY)
+    rotate(math.rad(this.rotation))
+    if this.gray or this.disabled then
+        setShader(Constant.grayShader)
     end
 
     if this.anchorX ~= 0 and this.anchorX ~= nil then
@@ -69,15 +78,21 @@ function Label._render(this)
             y = 0
         end
     end
-    this.graphics.one = {cmd="printf",args={this.text,x,y,this.width,this.align,0,1,1,this.pivotX,this.pivotY}};
-    this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY):_render();
-    this.graphics:translate(-this.pivotX,-this.pivotY)
+
+    printf(this.text,x,y,this.width,this.align,0,1,1,this.pivotX,this.pivotY)
+    --this.graphics.one = {cmd="printf",args={this.text,x,y,this.width,this.align,0,1,1,this.pivotX,this.pivotY}};
+    --this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY):_render();
+    --this.graphics:translate(-this.pivotX,-this.pivotY)
     for _,drawable in ipairs(this.components) do
         if drawable._render then
             drawable:_render()
         end
     end
-    this.graphics:_end();
+    --this.graphics:_end();
+    if this.gray or this.disabled then
+        setShader()
+    end
+    pop()
     return this;
 end
 
