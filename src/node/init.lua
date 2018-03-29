@@ -23,8 +23,10 @@ local Ease = require("node.core.Utils.Ease");
 local Label = require("node.ui.Label");
 local Sprite = require("node.ui.Image");
 
-local Stage = require("node.core.Display.Stage")
+local Stage = require("node.core.Display.Stage");
 local stage = Stage.new();
+
+local UIEvent = require("node.core.Event.UIEvent");
 
 
 
@@ -77,36 +79,49 @@ end
 
 local function mouseEvent(type,x,y)
     local _x,_y = touchPoint(x,y)
-    stage:event(type,{type,_x,_y})
+    stage:mouseEvent(type,_x,_y)
+end
+
+local function keyboardEvent(type,key)
+    stage:keyboardEvent(type,key)
 end
 
 local function wheelmoved( x, y )
 end
 
-
 local function touchmoved( id, x, y, dx, dy, pressure )
-    mouseEvent("MOUSE_MOVE",x,y)
+    mouseEvent(UIEvent.MOUSE_MOVE,x,y)
 end
 local function touchpressed( id, x, y, dx, dy, pressure )
-    mouseEvent("MOUSE_DOWN",x,y)
+    mouseEvent(UIEvent.MOUSE_DOWN,x,y)
 end
 local function touchreleased( id, x, y, dx, dy, pressure )
-    mouseEvent("MOUSE_UP",x,y)
+    mouseEvent(UIEvent.MOUSE_UP,x,y)
 end
 
 local function mousereleased(x, y, button, istouch)
-    mouseEvent("MOUSE_UP",x,y)
+    local type = UIEvent.MOUSE_UP;
+    if button == 2 then
+        type = UIEvent.RMOUSE_UP
+    end
+    mouseEvent(type,x,y)
 end
 local function mousepressed(x, y, button, istouch)
-    mouseEvent("MOUSE_DOWN",x,y)
+    local type = UIEvent.MOUSE_DOWN;
+    if button == 2 then
+        type = UIEvent.RMOUSE_DOWN
+    end
+    mouseEvent(type,x,y)
 end
 local function mousemoved( x, y, dx, dy, istouch)
-    mouseEvent("MOUSE_MOVE",x,y)
+    mouseEvent(UIEvent.MOUSE_MOVE,x,y)
 end
 
 local function keypressed(key, scancode, isrepeat)
+    keyboardEvent(UIEvent.KEY_DOWN,key)
 end
 local function keyreleased(key, scancode)
+    keyboardEvent(UIEvent.KEY_UP,key)
 end
 
 local function focus(b)

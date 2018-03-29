@@ -6,7 +6,8 @@ local class = require("node.class")
 
 local Drawable = require("node.core.Display.Drawable");
 local Utils = require("node.core.Utils.Utils");
-local Math = require("node.core.Math.Math")
+local Math = require("node.core.Math.Math");
+local UIEvent = require("node.core.Event.UIEvent");
 
 ---@param draw Drawable
 ---@param x number
@@ -46,29 +47,36 @@ function stage.ctor(this)
     this.name = "Stage"
 
     ---@type Node
-    local pressNode
+    this.pressNode = nil
+    this.mouseEnabled = true;
+end
 
-    local function mouseEvent(type,x,y)
-        local hit = HitObject(this,x,y)
-        if hit and hit.name ~= "Stage" then
-            if type == "MOUSE_DOWN" then
-                pressNode = hit
-            end
-            hit:event(type)
-            if type == "MOUSE_UP" then
-                if pressNode == hit then
-                    hit:event("CLICK")
-                end
+---@param this stage
+---@param type string
+---@param x number
+---@param y number
+function stage.mouseEvent(this,type,x,y)
+    local hit = HitObject(this,x,y)
+    if hit and hit.name ~= "Stage" then
+        if type == UIEvent.MOUSE_DOWN then
+            this.pressNode = hit
+        end
+        hit:event(type)
+        if type == UIEvent.MOUSE_UP then
+            if this.pressNode == hit then
+                hit:event(UIEvent.CLICK)
             end
         end
     end
-
-    --this:on("MOUSE_MOVE",mouseEvent)
-    this:on("MOUSE_DOWN",mouseEvent)
-    this:on("MOUSE_UP",mouseEvent)
-
+    return this
 end
 
+---@param this stage
+---@param type string
+function stage.keyboardEvent(this,type,key)
+    this:on(type,key)
+    return this
+end
 
 ---@param this stage
 function stage.draw(this)

@@ -13,7 +13,7 @@ local ScaleButton = class(Image)
 
 local Tween = require("node.core.Utils.Tween");
 local Ease = require("node.core.Utils.Ease");
-
+local UIEvent = require("node.core.Event.UIEvent");
 ---@param this ScaleButton
 ---@param skin string
 function ScaleButton.ctor(this,skin)
@@ -22,10 +22,10 @@ function ScaleButton.ctor(this,skin)
     this.anchorX = 0.5;
     this.anchorY = 0.5;
 
-    this:on("MOUSE_DOWN", function ()
+    this:on(UIEvent.MOUSE_DOWN, function ()
         Tween.to(this,{scaleX=0.8,scaleY=0.8},100,Ease.linear)
     end)
-    this:on("MOUSE_UP", function ()
+    this:on(UIEvent.MOUSE_UP, function ()
         Tween.to(this,{scaleX=1,scaleY=1},100,Ease.inBack)
         this._press = false;
     end)
