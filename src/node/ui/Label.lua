@@ -7,14 +7,14 @@
 --- DateTime: 2018/3/16 21:22
 ---
 ---@type Loader
-local Loader = require("nodeFrame.core.Net.Loader");
+local Loader = require("node.core.Net.Loader");
 
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
 ---@type Component
-local Component = require("nodeFrame.ui.Component")
+local Component = require("node.ui.Component")
 
-local Utils = require("nodeFrame.core.Utils.Utils")
+local Utils = require("node.core.Utils.Utils")
 
 local setShader,translate,scale,printf,pop,push,rotate = love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.printf,love.graphics.pop,love.graphics.push,love.graphics.rotate
 

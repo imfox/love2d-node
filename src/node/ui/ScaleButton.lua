@@ -3,16 +3,16 @@
 --- DateTime: 2018/3/27 21:43
 ---
 
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
 ---@type Sprite
-local Image = require("nodeFrame.ui.Image")
+local Image = require("node.ui.Image")
 
 ---@class ScaleButton : Sprite
 local ScaleButton = class(Image)
 
-local Tween = require("nodeFrame.core.Utils.Tween");
-local Ease = require("nodeFrame.core.Utils.Ease");
+local Tween = require("node.core.Utils.Tween");
+local Ease = require("node.core.Utils.Ease");
 
 ---@param this ScaleButton
 ---@param skin string

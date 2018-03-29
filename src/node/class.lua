@@ -1,4 +1,4 @@
-local Utils = require("nodeFrame.core.Utils.Utils");
+local Utils = require("node.core.Utils.Utils");
 --Create an class.
 local function class(super)
     local cls = {};

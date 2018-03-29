@@ -2,15 +2,15 @@
 --- Created by fox.
 --- DateTime: 2018/3/15 20:42
 ---
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
-local Utils = require("nodeFrame.core.Utils.Utils");
+local Utils = require("node.core.Utils.Utils");
 
 ---@type Node
-local Node = require("nodeFrame.core.Display.Node");
+local Node = require("node.core.Display.Node");
 
 ---@type Graphics
-local Graphics = require("nodeFrame.core.Display.Graphics");
+local Graphics = require("node.core.Display.Graphics");
 
 
 ---@class Drawable : Node

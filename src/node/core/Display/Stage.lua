@@ -2,11 +2,11 @@
 --- Created by fox.
 --- DateTime: 2018/3/27 22:08
 ---
-local class = require("nodeFrame.class")
+local class = require("node.class")
 
-local Drawable = require("nodeFrame.core.Display.Drawable");
-local Utils = require("nodeFrame.core.Utils.Utils");
-local Math = require("nodeFrame.core.Math.Math")
+local Drawable = require("node.core.Display.Drawable");
+local Utils = require("node.core.Utils.Utils");
+local Math = require("node.core.Math.Math")
 
 local rx = {}
 local px = 0

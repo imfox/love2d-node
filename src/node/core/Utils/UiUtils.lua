@@ -3,10 +3,10 @@
 --- DateTime: 2018/3/21 0:08
 ---
 
-local Drawable = require("nodeFrame.core.Display.Drawable");
-local Image = require("nodeFrame.ui.Image");
-local Label = require("nodeFrame.ui.Label");
-local ScaleButton = require("nodeFrame.ui.ScaleButton");
+local Drawable = require("node.core.Display.Drawable");
+local Image = require("node.ui.Image");
+local Label = require("node.ui.Label");
+local ScaleButton = require("node.ui.ScaleButton");
 local Utils = {};
 
 

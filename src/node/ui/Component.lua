@@ -4,15 +4,15 @@
 ---
 
 ---@type Loader
-local Loader = require("nodeFrame.core.Net.Loader");
+local Loader = require("node.core.Net.Loader");
 
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
 ---@type AutoBitmap
-local AutoBitmap = require("nodeFrame.ui.AutoBitmap")
+local AutoBitmap = require("node.ui.AutoBitmap")
 
 ---@type Drawable
-local Drawable = require("nodeFrame.core.Display.Drawable")
+local Drawable = require("node.core.Display.Drawable")
 
 
 ---@class Component : Drawable

@@ -8,7 +8,7 @@
 ---@field public args []
 ---@field public count number
 
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
 ---@class Message
 local Message = class();

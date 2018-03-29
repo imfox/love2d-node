@@ -3,10 +3,10 @@
 --- DateTime: 2018/3/16 21:53
 ---
 
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
 ---@type Message
-local Message = require("nodeFrame.core.Display.Message");
+local Message = require("node.core.Display.Message");
 
 
 ---@class Loader : Message

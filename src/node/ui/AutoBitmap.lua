@@ -2,10 +2,10 @@
 --- Created by fox.
 --- DateTime: 2018/3/16 21:23
 ---
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
 ---@type Graphics
-local Graphics = require("nodeFrame.core.Display.Graphics")
+local Graphics = require("node.core.Display.Graphics")
 
 ---@class AutoBitmap : Graphics
 local AutoBitmap = class(Graphics);

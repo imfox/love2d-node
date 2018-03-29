@@ -8,23 +8,22 @@
         import
 --]]
 
-class = require("nodeFrame.class");
-import = require("nodeFrame.import");
+class = require("node.class");
+import = require("node.import");
 
-local Node = require("nodeFrame.core.Display.Node");
-local Drawable = require("nodeFrame.core.Display.Drawable");
---local Graphics = require("nodeFrame.core.Display.Graphics");
+local Node = require("node.core.Display.Node");
+local Drawable = require("node.core.Display.Drawable");
 
-local Loader = require("nodeFrame.core.Net.Loader");
+local Loader = require("node.core.Net.Loader");
 
-local Timer = require("nodeFrame.core.Utils.Timer");
-local Tween = require("nodeFrame.core.Utils.Tween");
-local Ease = require("nodeFrame.core.Utils.Ease");
+local Timer = require("node.core.Utils.Timer");
+local Tween = require("node.core.Utils.Tween");
+local Ease = require("node.core.Utils.Ease");
 
-local Label = require("nodeFrame.ui.Label");
-local Sprite = require("nodeFrame.ui.Image");
+local Label = require("node.ui.Label");
+local Sprite = require("node.ui.Image");
 
-local Stage = require("nodeFrame.core.Display.Stage")
+local Stage = require("node.core.Display.Stage")
 local stage = Stage.new();
 
 

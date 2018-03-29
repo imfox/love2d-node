@@ -4,15 +4,15 @@
 ---
 
 ---@type Loader
-local Loader = require("nodeFrame.core.Net.Loader");
+local Loader = require("node.core.Net.Loader");
 
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
-local Utils = require("nodeFrame.core.Utils.Utils")
-local Constant = require("nodeFrame.core.Utils.Constant")
+local Utils = require("node.core.Utils.Utils")
+local Constant = require("node.core.Utils.Constant")
 
 ---@type Component
-local Component = require("nodeFrame.ui.Component")
+local Component = require("node.ui.Component")
 
 
 local newQuad_,setShader,translate,scale,draw,pop,push,rotate = love.graphics.newQuad,love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate

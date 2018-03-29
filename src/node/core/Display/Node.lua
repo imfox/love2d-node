@@ -1,8 +1,8 @@
 --local import = require("Import");
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
 ---@type Message
-local Message = require("nodeFrame.core.Display.Message")
+local Message = require("node.core.Display.Message")
 
 ---@class Node : Message
 local Node =  class(Message);

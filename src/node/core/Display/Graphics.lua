@@ -2,7 +2,7 @@
 --- Created by fox.
 --- DateTime: 2018/3/15 20:44
 ---
-local class = require("nodeFrame.class");
+local class = require("node.class");
 
 
 --[[
