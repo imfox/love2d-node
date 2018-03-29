@@ -141,7 +141,7 @@ local export = {
     Label = Label,
     Sprite = Sprite,
 
-    --@public
+    --@type Stage
     stage = stage,
 
     --@public
@@ -163,13 +163,15 @@ local export = {
 
 }
 
-local function init(title,width,height)
+local function init(this,title,width,height)
     love.window.setTitle(title);
     stage.width = width;
     stage.height = height;
     resize(love.graphics.getWidth(),love.graphics.getHeight())
     return export;
 end
+
+setmetatable(export,{__call=init})
 
 local function register()
     local funcs = {"load","update","draw","focus","resize","keypressed","keyreleased","wheelmoved"};
@@ -191,4 +193,4 @@ end
 
 export.register = register;
 
-return init;
+return export;
