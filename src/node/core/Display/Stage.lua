@@ -65,6 +65,8 @@ function stage.mouseEvent(this,type,x,y)
         if type == UIEvent.MOUSE_UP then
             if this.pressNode == hit then
                 hit:event(UIEvent.CLICK)
+            else
+                this.pressNode:event(UIEvent.MOUSE_LEAVE_UP)
             end
         end
     end

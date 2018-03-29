@@ -24,4 +24,6 @@ UIEvent.KEY_DOWN = "KEY_DOWN"
 UIEvent.KEY_UP = "KEY_UP"
 UIEvent.KEY_PRESS = "KEY_PRESS"
 
+UIEvent.MOUSE_LEAVE_UP = "MOUSE_LEAVE_UP"
+
 return UIEvent;

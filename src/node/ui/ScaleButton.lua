@@ -22,13 +22,10 @@ function ScaleButton.ctor(this,skin)
     this.anchorX = 0.5;
     this.anchorY = 0.5;
 
-    this:on(UIEvent.MOUSE_DOWN, function ()
-        Tween.to(this,{scaleX=0.8,scaleY=0.8},100,Ease.linear)
-    end)
-    this:on(UIEvent.MOUSE_UP, function ()
-        Tween.to(this,{scaleX=1,scaleY=1},100,Ease.inBack)
-        this._press = false;
-    end)
+    this:on(UIEvent.MOUSE_DOWN, Tween.to,{this,{scaleX=0.8,scaleY=0.8},100,Ease.linear});
+    this:on(UIEvent.MOUSE_UP, Tween.to,{this,{scaleX=1,scaleY=1},100,Ease.inBack});
+    this:on(UIEvent.MOUSE_LEAVE_UP,Tween.to,{this,{scaleX=1,scaleY=1},100,Ease.inBack});
+    
 end
 
 
