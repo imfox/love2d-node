@@ -164,6 +164,7 @@ local export = {
 }
 
 local function init(title,width,height)
+    love.window.setTitle(title);
     stage.width = width;
     stage.height = height;
     resize(love.graphics.getWidth(),love.graphics.getHeight())

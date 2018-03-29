@@ -76,7 +76,7 @@ end
 ---@param this stage
 ---@param type string
 function stage.keyboardEvent(this,type,key)
-    this:on(type,key)
+    this:event(type,{key})
     return this
 end
 
