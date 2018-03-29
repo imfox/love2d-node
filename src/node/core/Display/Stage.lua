@@ -8,9 +8,6 @@ local Drawable = require("node.core.Display.Drawable");
 local Utils = require("node.core.Utils.Utils");
 local Math = require("node.core.Math.Math")
 
-local rx = {}
-local px = 0
-local py = 0
 ---@param draw Drawable
 ---@param x number
 ---@param y number
