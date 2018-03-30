@@ -38,6 +38,10 @@ local function HitObject(draw,x,y)
     return hit
 end
 
+
+---@type stage
+local Stage
+
 ---@class stage : Drawable
 local stage = class(Drawable);
 
@@ -57,7 +61,7 @@ end
 ---@param y number
 function stage.mouseEvent(this,type,x,y)
     local hit = HitObject(this,x,y)
-    if hit and hit.name ~= "Stage" then
+    if hit and hit ~= Stage then
         if type == UIEvent.MOUSE_DOWN then
             this.pressNode = hit
         end
@@ -90,4 +94,5 @@ function stage:TestPoint(x,y)
 
 end
 
-return stage;
+Stage = stage.new();
+return Stage;

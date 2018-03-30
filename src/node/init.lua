@@ -11,8 +11,11 @@
 class = require("node.class");
 import = require("node.import");
 
+
 local Node = require("node.core.Display.Node");
 local Drawable = require("node.core.Display.Drawable");
+
+local stage = require("node.core.Display.Stage");
 
 local Loader = require("node.core.Net.Loader");
 
@@ -23,11 +26,7 @@ local Ease = require("node.core.Utils.Ease");
 local Label = require("node.ui.Label");
 local Sprite = require("node.ui.Image");
 
-local Stage = require("node.core.Display.Stage");
-local stage = Stage.new();
-
 local UIEvent = require("node.core.Event.UIEvent");
-
 
 
 local sclaeX, sclaeY = 1, 1
