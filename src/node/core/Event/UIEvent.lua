@@ -26,4 +26,9 @@ UIEvent.KEY_PRESS = "KEY_PRESS"
 
 UIEvent.MOUSE_LEAVE_UP = "MOUSE_LEAVE_UP"
 
+---@param type string
+function UIEvent.isMouseEvent(type)
+    return type == UIEvent.MOUSE_DOWN or type == UIEvent.MOUSE_UP or type == UIEvent.MOUSE_LEAVE_UP or type == UIEvent.MOUSE_MOVE or type == UIEvent.MOUSE_ENTER or type == UIEvent.MOUSE_OVER;
+end
+
 return UIEvent;

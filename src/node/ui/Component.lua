@@ -2,21 +2,12 @@
 --- Created by fox.
 --- DateTime: 2018/3/20 21:09
 ---
-
----@type Loader
-local Loader = require("node.core.Net.Loader");
-
 local class = require("node.class");
 
----@type AutoBitmap
-local AutoBitmap = require("node.ui.AutoBitmap")
+local Box = require("node.ui.Box")
 
----@type Drawable
-local Drawable = require("node.core.Display.Drawable")
-
-
----@class Component : Drawable
-local Component = class(Drawable);
+---@class Component : Box
+local Component = class(Box);
 
 ---@param this Component
 function Component.ctor(this)
@@ -39,7 +30,9 @@ function Component.ctor(this)
     this.tag = nil;
     this.gray = false;
     this.disabled = false;
-    this.dataSource = nil;
+
+    -- [[ 自动根据自身或者子组件来制定自身的范围 --]]
+    this.autoSize = true;
 
 end
 
@@ -54,5 +47,15 @@ end
 function Component.initialize(this,...)
 end
 
+-- 应该由子组件完成
+---@param this Component
+function Component.displayHeight(this)
+    return this.height;
+end
+
+---@param this Component
+function Component.displayWidth(this)
+    return this.width;
+end
 
 return Component;
