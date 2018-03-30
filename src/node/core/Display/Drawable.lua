@@ -11,6 +11,7 @@ local Node = require("node.core.Display.Node");
 
 ---@type Graphics
 local Graphics = require("node.core.Display.Graphics");
+local UIEvent = require("node.core.Event.UIEvent");
 
 
 ---@class Drawable : Node
@@ -36,20 +37,36 @@ function Drawable.ctor(this)
     this.mouseEnabled = false;
 end
 
+---@param node Drawable
+function _mouseEnable(node)
+    local parent = node
+    while parent do -- 开启全部父节点可以点击
+        parent.mouseEnabled = true;
+        parent = parent.parent
+    end
+end
+
 ---@param this Drawable
 ---@param type string
 function Drawable.on(this,type,...)
-    if type == "MOUSE_DOWN" or type == "MOUSE_MOVE" or type == "MOUSE_UP" or type == "CLICK" then
-        this.mouseEnabled = true;
-        local parent = this
-        while parent do -- 开启全部父节点可以点击
-            parent.mouseEnabled = true;
-            parent = parent.parent
-        end
-    end
     this:call("on",type,...)
+    if UIEvent.isMouseEvent(type) then
+        _mouseEnable(this);
+    end
     return this
 end
+
+---@param this Drawable
+---@param node Drawable
+---@param index number
+---@return Node
+function Drawable.addChildAt(this,node,index)
+    this:call("addChildAt",node,index)
+    if node.mouseEnabled then
+        _mouseEnable(this);
+    end
+end
+
 
 ---@field public x number
 ---@field public y number
