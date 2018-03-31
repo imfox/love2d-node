@@ -23,6 +23,7 @@ local Timer = require("node.core.Utils.Timer");
 local Tween = require("node.core.Utils.Tween");
 local Ease = require("node.core.Utils.Ease");
 
+local Dialog = require("node.ui.Dialog");
 local Label = require("node.ui.Label");
 local Sprite = require("node.ui.Image");
 
@@ -73,7 +74,6 @@ local function draw()
     love.graphics.scale(sclaeX,sclaeY)
     stage:draw()
     love.graphics.pop()
-    love.graphics.setShader(unpack({}))
 end
 
 local function mouseEvent(type,x,y)
@@ -136,6 +136,7 @@ local export = {
     Timer = Timer,
     Tween = Tween,
     Ease = Ease,
+    Dialog = Dialog,
 
     Label = Label,
     Sprite = Sprite,

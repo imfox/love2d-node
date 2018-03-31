@@ -93,8 +93,15 @@ end
 
 ---@param this Graphics
 ---@return Graphics
-function Graphics.rectangle(this,...)
-    this:pushCmd("rectangle",{...})
+function Graphics.rectangle(this,mode,x,y,w,h)
+    this:pushCmd("rectangle",{mode,x,y,w,h})
+    return this;
+end
+
+---@param this Graphics
+---@return Graphics
+function Graphics.setColor(this,r,g,b,a)
+    this:pushCmd("setColor",{r,g,b,a})
     return this;
 end
 

@@ -38,16 +38,75 @@ local function newQuad(quad, x, y, w, h, width, height)
     return quad
 end
 
+
+
 ---@class Sprite : Component
+---@field public sizeGrid string
+---@field public skin string
+---@field private _sizeGrid string
 local Sprite = class(Component)
+
 
 ---@param this Sprite
 ---@param skin string
 function Sprite.ctor(this,skin)
-    --this.graphics = AutoBitmap.new();
     this:super()
+
+    this:set("skin",function (v)
+        this._skin = v;
+        this._image = Loader:getImage(this._skin);
+        this:_repaint(this)
+    end)
+    this:get("skin",function ()
+        return this._skin;
+    end)
+
+    this._sizeGrid = nil
+
+    this:set("sizeGrid", function (v)
+        local grids =  Utils.splteText(v,",");
+        this:__setGrid(unpack(grids));
+        this._sizeGrid = true;
+    end)
+    this:get("sizeGrid",function ()
+        return this._sizeGrid;
+    end )
+
+    this._width = nil
+    this:set("width", function (v)
+        this._width = v;
+        this.autoSize = false;
+        this:_repaint(this)
+        this:_changeSize()
+    end)
+    this:get("width", function ()
+        if this._width == nil  then
+            if this._image then
+                return this._image:getWidth()
+            end
+            return 0
+        end
+        return this._width;
+    end)
+
+    this._height = nil
+    this:set("height", function (v)
+        this._height = v;
+        this.autoSize = false;
+        this:_repaint(this)
+        this:_changeSize()
+    end)
+    this:get("height", function ()
+        if this._height == nil  then
+            if this._image then
+                return this._image:getHeight()
+            end
+            return 0
+        end
+        return this._height;
+    end)
+
     this.skin = skin;
-    this.sizeGrid = "";
 end
 
 ---@field public graphics AutoBitmap
@@ -68,48 +127,19 @@ function Sprite._render(this)
         setShader(Constant.grayShader)
     end
 
-    if Loader:getImage(this.skin) ~= nil then
+    if this._image ~= nil then
         this.graphics:clear();
 
         ---@type Image
-        local img = Loader:getImage(this.skin);
-
+        local img = this._image;
         local width = img:getWidth()
         local height = img:getHeight()
 
-        this.width = this.width == 0 and width or this.width;
-        this.height = this.height == 0 and height or this.height;
-
-        if this.anchorX ~= 0 and this.anchorX ~= nil then
-            this.pivotX = this.width * this.anchorX;
-        end
-        if this.anchorY ~= 0 and this.anchorY ~= nil then
-            this.pivotY = this.height * this.anchorY;
-        end
-        if this.parent then
-            if this.left ~= nil then
-                this.x = this.left + this.pivotX;
-            end
-            if this.top ~= nil then
-                this.y =  this.top + this.pivotY;
-            end
-            if this.right ~= nil then
-                this.width = this.parent.width - (this.x-this.pivotX) - this.right;
-            end
-            if this.bottom ~= nil then
-                this.height = this.parent.height - (this.y-this.pivotY) - this.bottom;
-            end
-       end
-
-
-        if this.sizeGrid == nil or this.sizeGrid == "" then
+        if this._sizeGrid == nil then
             local sx = this.width / width;
             local sy = this.height / height;
             draw(img,0,0,0,sx,sy,this.pivotX/sx,this.pivotY/sy)
         else
-            local grids =  Utils.splteText(this.sizeGrid,",");
-            this:__setGrid(unpack(grids));
-
             local gridCenterWidth = width - this._grid[1] - this._grid[3]
             local gridCenterHeight = height - this._grid[2] - this._grid[4]
 

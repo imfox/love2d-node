@@ -7,6 +7,7 @@ local Drawable = require("node.core.Display.Drawable");
 local Image = require("node.ui.Image");
 local Label = require("node.ui.Label");
 local ScaleButton = require("node.ui.ScaleButton");
+local Dialog = require("node.ui.Dialog");
 local Utils = {};
 
 
@@ -18,6 +19,8 @@ function Utils.getInstance(className)
         return Label.new();
     elseif className == "ScaleButton" then
         return ScaleButton.new();
+    elseif className == "Dialog" then
+        return Dialog.new();
     else
         return Drawable.new()
     end

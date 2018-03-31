@@ -22,17 +22,39 @@ function Drawable.ctor(this)
     this:super()
     this.x = 0;
     this.y = 0;
+    this.zOrder = 0;
     this.scaleX = 1;
     this.scaleY = 1;
     this.pivotX = 0;
     this.pivotY = 0;
-    this.width = 0;
-    this.height = 0;
+    --this.width = 0;
+    --this.height = 0;
     this.alpha = 1;
     this.rotation = 0;
     this.visible = true;
     this.graphics = Graphics.new();
     this.id =  Utils.getGID();
+
+    this._width = nil
+    this:set("width", function (v)
+        this._width = v;
+        this.autoSize = false;
+        this:_changeSize()
+    end)
+    this:get("width", function ()
+        return this._width or 0;
+    end)
+
+    this._height = nil
+    this:set("height", function (v)
+        this._height = v;
+        this.autoSize = false;
+        this:_changeSize()
+    end)
+    this:get("height", function ()
+        return this._height or 0;
+    end)
+
 
     this.mouseEnabled = false;
 end
@@ -62,11 +84,18 @@ end
 ---@return Node
 function Drawable.addChildAt(this,node,index)
     this:call("addChildAt",node,index)
+    this.sortTabel = this.sortTabel or {}
+    this.sortTabel[node] = this:numChild() + 1;
     if node.mouseEnabled then
         _mouseEnable(this);
     end
 end
-
+function Drawable.removeChildAt(this,node,index)
+    this:call("removeChildAt",node,index)
+    if this.sortTabel then
+        this.sortTabel[node] = nil
+    end
+end
 
 ---@field public x number
 ---@field public y number
@@ -131,6 +160,15 @@ end
 function Drawable.globalToLocal(this,x,y)
     return x,y;
 end
+---@param a Drawable
+---@param b Drawable
+local function _sort(a,b)
+    local this = a.parent;
+    if a.zOrder == b.zOrder then
+        return this.sortTabel[a] < this.sortTabel[b];
+    end
+    return a.zOrder < b.zOrder;
+end
 
 ---@param this Drawable
 ---@return Drawable
@@ -138,14 +176,23 @@ function Drawable._render(this)
     if not this.visible or this.destroyed or this.alpha == 0 or this.scaleY ==0 or this.scaleX == 0 then    -- 已经不会显示出来了
         return this;
     end
+    local r,g,b,a = love.graphics.getColor()
+    love.graphics.setColor(r,g,b,this.alpha*255)
     this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY):_render();
-    for _,drawable in ipairs(this.components) do 
+    table.sort(this.components,_sort)
+    for _,drawable in ipairs(this.components) do
         if drawable._render then 
             drawable:_render()
         end
     end
+    love.graphics.setColor(r,g,b,a)
     this.graphics:_end();
     return this;
+end
+
+---@param this Drawable
+function Drawable._changeSize(this)
+    this:event(UIEvent.RESIZE)
 end
 
 return Drawable;
