@@ -8,7 +8,7 @@ local Utils = require("node.core.Utils.Utils");
 
 ---@type Node
 local Node = require("node.core.Display.Node");
-
+local Message = require("node.core.Display.Message")
 ---@type Graphics
 local Graphics = require("node.core.Display.Graphics");
 local UIEvent = require("node.core.Event.UIEvent");
@@ -19,7 +19,7 @@ local Drawable = class(Node);
 
 ---@param this Drawable
 function Drawable.ctor(this)
-    this:super()
+    Node.ctor(this)
     this.x = 0;
     this.y = 0;
     this.zOrder = 0;
@@ -71,7 +71,7 @@ end
 ---@param this Drawable
 ---@param type string
 function Drawable.on(this,type,...)
-    this:call("on",type,...)
+    Message.on(this,type,...)
     if UIEvent.isMouseEvent(type) then
         _mouseEnable(this);
     end
@@ -83,7 +83,7 @@ end
 ---@param index number
 ---@return Node
 function Drawable.addChildAt(this,node,index)
-    this:call("addChildAt",node,index)
+    Node.addChildAt(this,node,index)
     this.sortTabel = this.sortTabel or {}
     this.sortTabel[node] = this:numChild() + 1;
     if node.mouseEnabled then
@@ -91,7 +91,7 @@ function Drawable.addChildAt(this,node,index)
     end
 end
 function Drawable.removeChildAt(this,node,index)
-    this:call("removeChildAt",node,index)
+    Node.removeChildAt(this,node,index)
     if this.sortTabel then
         this.sortTabel[node] = nil
     end

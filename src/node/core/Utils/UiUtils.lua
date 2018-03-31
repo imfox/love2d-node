@@ -3,7 +3,7 @@
 --- DateTime: 2018/3/21 0:08
 ---
 
-local Drawable = require("node.core.Display.Drawable");
+local Box = require("node.ui.Box");
 local Image = require("node.ui.Image");
 local Label = require("node.ui.Label");
 local ScaleButton = require("node.ui.ScaleButton");
@@ -22,7 +22,7 @@ function Utils.getInstance(className)
     elseif className == "Dialog" then
         return Dialog.new();
     else
-        return Drawable.new()
+        return Box.new()
     end
 end
 
@@ -38,7 +38,6 @@ function Utils.createByTable(table,node,root)
 
     local props = table.props;
     if not node then
-        --print(table.type)
         node = Utils.getInstance(table.type);
     end
 

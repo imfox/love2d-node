@@ -24,7 +24,7 @@ local Label = class(Component)
 
 ---@param this Label
 function Label.ctor(this)
-    this:super()
+    Component.ctor(this)
     --this.graphics = AutoBitmap.new();
     this.text = "";
     this.align = "left";
@@ -48,27 +48,27 @@ function Label._render(this)
     if this.gray or this.disabled then
         setShader(Constant.grayShader)
     end
-
-    if this.anchorX ~= 0 and this.anchorX ~= nil then
-        this.pivotX = this.width * this.anchorX;
-    end
-    if this.anchorY ~= 0 and this.anchorY ~= nil then
-        this.pivotY = this.height * this.anchorY;
-    end
-    if this.parent then
-        if this.left ~= nil then
-            this.x = this.left + this.pivotX;
-        end
-        if this.top ~= nil then
-            this.y =  this.top + this.pivotY;
-        end
-        if this.right ~= nil then
-            this.width = this.parent.width - (this.x-this.pivotX) - this.right;
-        end
-        if this.bottom ~= nil then
-            this.height = this.parent.height - (this.y-this.pivotY) - this.bottom;
-        end
-    end
+    --
+    --if this.anchorX ~= 0 and this.anchorX ~= nil then
+    --    this.pivotX = this.width * this.anchorX;
+    --end
+    --if this.anchorY ~= 0 and this.anchorY ~= nil then
+    --    this.pivotY = this.height * this.anchorY;
+    --end
+    --if this.parent then
+    --    if this.left ~= nil then
+    --        this.x = this.left + this.pivotX;
+    --    end
+    --    if this.top ~= nil then
+    --        this.y =  this.top + this.pivotY;
+    --    end
+    --    if this.right ~= nil then
+    --        this.width = this.parent.width - (this.x-this.pivotX) - this.right;
+    --    end
+    --    if this.bottom ~= nil then
+    --        this.height = this.parent.height - (this.y-this.pivotY) - this.bottom;
+    --    end
+    --end
 
     local x,y = 0,0;
     if this.valign == "middle" or this.valign  == "bottom" then

@@ -1,83 +1,67 @@
---Create an class.
-local function class(super)
-    local cls = {}
-    cls.__base = {}
-    if super then
-        for _, base in ipairs(super.__base) do
-            table.insert(cls.__base, base)
+--[[
+	* When using New() would not automatically use Ctor() of the base class, you should manually use it. (Base.Ctor(self, ...))
+	* When accessing attribute of the base class, you should use self.xxx, if the current class has homonymous attribute that will cover the base class.
+	* When accessing method of the base class, you should use Base.func(self, ...).
+	* When using self:func(), if the current class has not it, that will access the method of the base class and upper untill access it.
+]] --
+
+local Utils = require("node.core.Utils.Utils")
+local clone = Utils.tableClone
+
+local function class(...) -- super list
+    local cls
+    local superList = {...}
+
+    if (#superList > 0) then
+        cls = clone(superList[1])
+
+        for n = 2, #superList do
+            cls = clone(superList[n], cls)
         end
-        table.insert(cls.__base, super)
+    else
+        cls = {
+            ctor = function()
+            end
+        }
     end
-    cls._index = #cls.__base
-    cls.new = function(...)
-        local instance
+
+    function cls.new(...)
         local sets = {}
         local gets = {}
-        instance =
+        local instance =
         setmetatable(
-        {_index = cls._index, __base = {}},
+        {},
         {
             __index = function(t, k)
-                if (gets[k]) then
+                if gets[k] then
                     return gets[k]()
                 end
-                for i = #t.__base, 1, -1 do
-                    if t.__base[i][k] then
-                        return t.__base[i][k]
-                    end
-                end
+                return cls[k]
             end,
             __newindex = function(t, k, v)
-                if (sets[k]) then
+                if sets[k] then
                     return sets[k](v)
                 end
                 rawset(t, k, v)
             end
         }
         )
-
         instance.set = function(this, name, func)
             instance[name] = nil
-            sets[name] = func;
+            sets[name] = func
             return instance
         end
         instance.get = function(this, name, func)
             gets[name] = func
             return instance
         end
-        for _, base in ipairs(cls.__base) do
-            table.insert(instance.__base, base)
-        end
-        table.insert(instance.__base, cls)
 
-        if #instance.__base > 0 then
-            instance.super = function(this, ...)
-                local o = this.__base[this._index]
-                local index = this._index
-                this._index = index - 1
-                o.ctor(this, ...)
-                this._index = index
-            end
-            instance.call = function(this, f, ...)
-                local index = this._index
-                for i = index, 1, -1 do
-                    local base = this.__base[i]
-                    if base[f] then
-                        this._index = i - 1
-                        base[f](this, ...)
-                        this._index = index
-                        return
-                    end
-                end
-                error("Property '" .. f .. "' does not exist on 'super'.")
-            end
-        end
-
-        if cls.ctor then
-            cls.ctor(instance, ...)
-        end
+        instance.class = cls
+        instance:ctor(...)
         return instance
     end
+
     return cls
 end
-return class;
+
+return class

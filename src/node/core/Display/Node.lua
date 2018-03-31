@@ -13,7 +13,7 @@ local Node =  class(Message);
 ---@field public destroyed boolean @是否已经被销毁
 
 function Node:ctor()
-    self:super()
+    Message.ctor(self)
     self.name = "";
     self.components = {};
     self.parent = nil;

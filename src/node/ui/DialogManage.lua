@@ -19,7 +19,7 @@ local DialogManage = class(Drawable);
 
 ---@param this DialogManage
 function DialogManage.ctor(this)
-    this:super()
+    Drawable.ctor(this)
     this.maskLayer = Drawable.new();
     this.visible = false;
 

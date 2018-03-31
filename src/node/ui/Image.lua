@@ -50,12 +50,11 @@ local Sprite = class(Component)
 ---@param this Sprite
 ---@param skin string
 function Sprite.ctor(this,skin)
-    this:super()
-
+    Component.ctor(this)
     this:set("skin",function (v)
         this._skin = v;
         this._image = Loader:getImage(this._skin);
-        this:_repaint(this)
+        this:_repaint()
     end)
     this:get("skin",function ()
         return this._skin;
@@ -64,20 +63,21 @@ function Sprite.ctor(this,skin)
     this._sizeGrid = nil
 
     this:set("sizeGrid", function (v)
-        local grids =  Utils.splteText(v,",");
-        this:__setGrid(unpack(grids));
-        this._sizeGrid = true;
+        this._sizeGrid = v;
+        this:_repaint();
     end)
     this:get("sizeGrid",function ()
         return this._sizeGrid;
     end )
 
-    this._width = nil
+    this._width = 0
     this:set("width", function (v)
-        this._width = v;
-        this.autoSize = false;
-        this:_repaint(this)
-        this:_changeSize()
+        if this._width ~= v then
+            this._width = v;
+            this.autoSize = false;
+            this:_repaint()
+            this:_changeSize()
+        end
     end)
     this:get("width", function ()
         if this._width == nil  then
@@ -89,12 +89,14 @@ function Sprite.ctor(this,skin)
         return this._width;
     end)
 
-    this._height = nil
+    this._height = 0
     this:set("height", function (v)
-        this._height = v;
-        this.autoSize = false;
-        this:_repaint(this)
-        this:_changeSize()
+        if this._height ~= v then
+            this._height = v;
+            this.autoSize = false;
+            this:_repaint()
+            this:_changeSize()
+        end
     end)
     this:get("height", function ()
         if this._height == nil  then
@@ -106,7 +108,17 @@ function Sprite.ctor(this,skin)
         return this._height;
     end)
 
+
     this.skin = skin;
+end
+
+---@param this Sprite
+function Sprite._repaint(this)
+    Component._repaint(this)
+    if this._skin and this._sizeGrid then
+        local grids =  Utils.splteText(this._sizeGrid,",");
+        this:__setGrid(unpack(grids));
+    end
 end
 
 ---@field public graphics AutoBitmap

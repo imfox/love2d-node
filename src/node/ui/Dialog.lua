@@ -12,7 +12,7 @@ local Dialog = class(View);
 
 ---@param this View
 function Dialog.ctor(this)
-    this:super()
+    View.ctor(this)
     this.dragArea = nil;
 end
 

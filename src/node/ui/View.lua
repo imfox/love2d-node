@@ -4,15 +4,15 @@
 ---
 local class = require("node.class");
 
----@type Drawable
-local Drawable = require("node.core.Display.Drawable")
+---@type Component
+local Component = require("node.ui.Component")
 
----@class View : Drawable
-local View = class(Drawable);
+---@class View : Component
+local View = class(Component);
 
 ---@param this View
 function View.ctor(this)
-    this:super()
+    Component.ctor(this)
 
 end
 

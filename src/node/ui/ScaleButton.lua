@@ -17,7 +17,7 @@ local UIEvent = require("node.core.Event.UIEvent");
 ---@param this ScaleButton
 ---@param skin string
 function ScaleButton.ctor(this,skin)
-    this:super(skin)
+    Image.ctor(this,skin);
 
     this.anchorX = 0.5;
     this.anchorY = 0.5;

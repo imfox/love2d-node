@@ -23,6 +23,7 @@ local Timer = require("node.core.Utils.Timer");
 local Tween = require("node.core.Utils.Tween");
 local Ease = require("node.core.Utils.Ease");
 
+local View = require("node.ui.View");
 local Dialog = require("node.ui.Dialog");
 local Label = require("node.ui.Label");
 local Sprite = require("node.ui.Image");
@@ -136,6 +137,8 @@ local export = {
     Timer = Timer,
     Tween = Tween,
     Ease = Ease,
+
+    View = View,
     Dialog = Dialog,
 
     Label = Label,

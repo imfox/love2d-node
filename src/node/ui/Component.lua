@@ -4,16 +4,18 @@
 ---
 local class = require("node.class");
 
-local Box = require("node.ui.Box")
+---@type Drawable
+local Drawable = require("node.core.Display.Drawable")
 
----@class Component : Box
+---@class Component : Drawable
 ---@field anchorX number
 ---@field anchorY number
-local Component = class(Box);
+local Component = class(Drawable);
 
 ---@param this Component
 function Component.ctor(this)
-    this:super()
+    --this:super()
+    Drawable.ctor(this)
     --[[
         使用以下属性将会无视 pivotX,pivotY
     --]]
@@ -24,14 +26,14 @@ function Component.ctor(this)
         this._anchorX = v;
         this:_repaint();
     end)
-    this:get("anchorX",function (v)
+    this:get("anchorX",function ()
         return this._anchorX;
     end)
     this:set("anchorY",function (v)
         this._anchorY = v;
         this:_repaint();
     end)
-    this:get("anchorY",function (v)
+    this:get("anchorY",function ()
         return this._anchorY;
     end)
 
@@ -43,6 +45,13 @@ function Component.ctor(this)
     this.left = nil;
     this.right = nil;
 
+    this:set("top",function (v)
+        this._top = v;
+        this:_repaint()
+    end)
+    this:get("top",function ()
+        return this._top;
+    end)
 
     this.tag = nil;
     this.gray = false;
@@ -52,6 +61,16 @@ function Component.ctor(this)
     this.autoSize = true;
 
 end
+
+---@param this Component
+---@param node Component
+---@param index number
+function Component.addChildAt(this, node, index)
+    Drawable.addChildAt(this,node,index)
+    node:_repaintChilds()
+    return this;
+end
+
 
 ---@param this Component
 function Component._repaint(this)
@@ -77,6 +96,14 @@ function Component._repaint(this)
         end
     end
 
+end
+
+---@param this Component
+function Component._repaintChilds(this)
+    this:_repaint()
+    for i=1,this:numChild() do
+        this:getChildAt(i):_repaintChilds()
+    end
 end
 
 ---@param this Component

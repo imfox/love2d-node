@@ -5,19 +5,17 @@
 
 local class = require("node.class");
 
----@type Drawable
-local Drawable = require("node.core.Display.Drawable")
+---@type Component
+local Component = require("node.ui.Component")
 
----@class Box : Drawable
-local Box = class(Drawable);
+---@class Box : Component
+local Box = class(Component);
 
 ---@param this Box
 function Box.ctor(this)
-    this:super()
-
+    Component.ctor(this)
     --@type table
     this.dataSource = nil;
-
 end
 
 return Box;

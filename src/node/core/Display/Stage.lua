@@ -47,7 +47,7 @@ local stage = class(Drawable);
 
 ---@param this stage
 function stage.ctor(this)
-    this:super()
+    Drawable.ctor(this)
     this.name = "Stage"
 
     ---@type Node
@@ -87,11 +87,8 @@ end
 ---@param this stage
 function stage.draw(this)
     this:_render()
-end
-
-
-function stage:TestPoint(x,y)
-
+    local status = love.graphics.getStats()
+    love.window.setTitle(string.format("fps:%d  images:%d  drawcalls:%d",love.timer.getFPS(),status.images,status.drawcalls))
 end
 
 Stage = stage.new();
