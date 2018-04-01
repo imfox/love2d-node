@@ -29,7 +29,7 @@ local Label = require("node.ui.Label");
 local Sprite = require("node.ui.Image");
 
 local UIEvent = require("node.core.Event.UIEvent");
-
+local UIUtils = require("node.core.Utils.UiUtils");
 
 local sclaeX, sclaeY = 1, 1
 local offsetX, offsetY = 0, 0
@@ -75,6 +75,16 @@ local function draw()
     love.graphics.scale(sclaeX,sclaeY)
     stage:draw()
     love.graphics.pop()
+
+    if offsetX ~= 0 or offsetY ~= 0 then  --隐藏其它...比较搓
+        local w,h = love.graphics.getWidth(),love.graphics.getHeight()
+        love.graphics.setColor(0,0,0,255)
+        love.graphics.rectangle("fill",0,0,offsetX,h)
+        love.graphics.rectangle("fill",0,0,w,offsetY)
+        love.graphics.rectangle("fill",w-offsetX,0,offsetX,h)
+        love.graphics.rectangle("fill",0,h-offsetY,w,offsetY)
+        love.graphics.setColor(255,255,255,255)
+    end
 end
 
 local function mouseEvent(type,x,y)
@@ -136,6 +146,8 @@ local export = {
     Loader = Loader,
     Timer = Timer,
     Tween = Tween,
+    UIEvent = UIEvent,
+    UIUtils = UIUtils,
     Ease = Ease,
 
     View = View,
@@ -179,10 +191,10 @@ setmetatable(export,{__call=init})
 local function register()
     local funcs = {"load","update","draw","focus","resize","keypressed","keyreleased","wheelmoved"};
 
-    local touchFuncs = {"touchmoved","touchreleased","touchpressed"};
-    local system = string.lower(love.system.getOS());
-    if system == "windows" or system == "linux" then
-        touchFuncs = {"mousemoved","mousepressed","mousereleased"}
+    local touchFuncs = {"mousemoved","mousepressed","mousereleased"}
+    local system = love.system.getOS();
+    if system == "Android" or system == "iOS" then
+        touchFuncs = {"touchmoved","touchreleased","touchpressed"};
     end
 
     for _, name in pairs(touchFuncs) do
