@@ -26,7 +26,7 @@ local Ease = require("node.core.Utils.Ease");
 local View = require("node.ui.View");
 local Dialog = require("node.ui.Dialog");
 local Label = require("node.ui.Label");
-local Sprite = require("node.ui.Image");
+local Image = require("node.ui.Image");
 
 local UIEvent = require("node.core.Event.UIEvent");
 local UIUtils = require("node.core.Utils.UiUtils");
@@ -154,7 +154,7 @@ local export = {
     Dialog = Dialog,
 
     Label = Label,
-    Sprite = Sprite,
+    Image = Image,
 
     --@type Stage
     stage = stage,
