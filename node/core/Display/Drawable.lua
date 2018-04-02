@@ -13,6 +13,8 @@ local Message = require("node.core.Display.Message")
 local Graphics = require("node.core.Display.Graphics");
 local UIEvent = require("node.core.Event.UIEvent");
 
+local setShader,translate,scale,draw,pop,push,rotate = love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate
+
 
 ---@class Drawable : Node
 local Drawable = class(Node);
@@ -178,7 +180,12 @@ function Drawable._render(this)
     end
     local r,g,b,a = love.graphics.getColor()
     love.graphics.setColor(r,g,b,this.alpha*255)
-    this.graphics:_begin(this.x,this.y,this.rotation,this.scaleX,this.scaleY):_render();
+    push()
+    translate(this.x,this.y)
+    scale(this.scaleX,this.scaleY)
+    rotate(math.rad(this.rotation))
+    this.graphics:_render();
+    translate(-this.pivotX,-this.pivotY)
     table.sort(this.components,_sort)
     for _,drawable in ipairs(this.components) do
         if drawable._render then 
@@ -186,7 +193,7 @@ function Drawable._render(this)
         end
     end
     love.graphics.setColor(r,g,b,a)
-    this.graphics:_end();
+    pop()
     return this;
 end
 

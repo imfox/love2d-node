@@ -54,6 +54,7 @@ function Sprite.ctor(this,skin)
     this:set("skin",function (v)
         this._skin = v;
         this._image = Loader:getImage(this._skin);
+        this:_onResize()
         this:_updateSkin()
     end)
     this:get("skin",function ()

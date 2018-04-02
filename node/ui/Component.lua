@@ -10,6 +10,10 @@ local Drawable = require("node.core.Display.Drawable")
 ---@class Component : Drawable
 ---@field anchorX number
 ---@field anchorY number
+---@field measureWidth number
+---@field measureHeight number
+---@field displayWidth number
+---@field displayHeight number
 local Component = class(Drawable);
 
 ---@param this Component
@@ -23,18 +27,23 @@ function Component.ctor(this)
     this._anchorY = nil
 
     this:set("anchorX",function (v)
-        this._anchorX = v;
-        this:_onResize();
+        if v ~= this._anchorX then
+            this._anchorX = v;
+            this:_onResize();
+        end
     end)
     this:get("anchorX",function ()
-        return this._anchorX;
+        return this._anchorX or 0;
     end)
+
     this:set("anchorY",function (v)
-        this._anchorY = v;
-        this:_onResize();
+        if this._anchorY ~= v then
+            this._anchorY = v;
+            this:_onResize();
+        end
     end)
     this:get("anchorY",function ()
-        return this._anchorY;
+        return this._anchorY or 0;
     end)
 
     --[[
@@ -55,23 +64,51 @@ function Component.ctor(this)
 
     this._width = nil;
     this:set("width",function (v)
-        this._width = v;
+        if v ~= this._width then
+            this._width = v;
+            this:_onResize()
+        end
     end)
 
     this:get("width",function ()
         if this._width then return this._width end;
-        return this:measureWidth()
+        return this.measureWidth
     end)
 
     this._height = nil;
     this:set("height",function (v)
-        this._height = v;
+        if v ~= this._height then
+            this._height = v;
+            this:_onResize()
+        end
     end)
 
     this:get("height",function ()
         if this._height then return this._height end;
-        return this:measureHeight()
+        return this.measureHeight;
     end)
+
+
+    this._scaleX = 1;
+    this:set("scaleX",function (v)
+        this._scaleX = v;
+        this:_onResize()
+    end)
+
+    this:get("scaleX",function ()
+        return this._scaleX;
+    end)
+
+    this._scaleY = 1;
+    this:set("scaleY",function (v)
+        this._scaleY = v;
+        this:_onResize()
+    end)
+
+    this:get("scaleY",function ()
+        return this._scaleY;
+    end)
+
 
     this.tag = nil;
     this.gray = false;
@@ -79,6 +116,38 @@ function Component.ctor(this)
 
     -- [[ 自动根据自身或者子组件来制定自身的范围 --]]
     this.autoSize = true;
+
+    this:get("measureWidth",function ()
+        local max = 0;
+        for i=this:numChild(),1,-1 do
+            ---@type Sprite
+            local comp = this:getChildAt(i);
+            if comp.visible then
+                max = math.max(comp.x+comp.width*comp.scaleX,max);
+            end
+        end
+        return max;
+    end)
+
+    this:get("measureHeight",function ()
+        local max = 0;
+        for i=this:numChild(),1,-1 do
+            ---@type Sprite
+            local comp = this:getChildAt(i);
+            if comp.visible then
+                max = math.max(comp.y+comp.height*comp.scaleY,max);
+            end
+        end
+        return max;
+    end)
+
+
+    this:get("displayWidth",function ()
+        return this.width * this.scaleX;
+    end)
+    this:get("displayHeight",function ()
+        return this.height * this.scaleY;
+    end)
 
 end
 
@@ -135,44 +204,6 @@ end
 ---@protected
 ---@return Component
 function Component.initialize(this,...)
-end
-
----@param this Component
-function Component.displayWidth(this)
-    return this.width * this.scaleX;
-end
-
----@param this Component
-function Component.displayHeight(this)
-    return this.height * this.scaleY;
-end
-
----@param this Component
----@return number
-function Component.measureWidth(this)
-    local max = 0;
-    for i=this:numChild(),1,-1 do
-        ---@type Sprite
-        local comp = this:getChildAt(i);
-        if comp.visible then
-            max = math.max(comp.x+comp.width*comp.scaleX,max);
-        end
-    end
-    return max;
-end
-
----@param this Component
----@return number
-function Component.measureHeight(this)
-    local max = 0;
-    for i=this:numChild(),1,-1 do
-        ---@type Sprite
-        local comp = this:getChildAt(i);
-        if comp.visible then
-            max = math.max(comp.y+comp.height*comp.scaleY,max);
-        end
-    end
-    return max;
 end
 
 return Component;
