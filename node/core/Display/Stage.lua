@@ -14,7 +14,7 @@ local UIEvent = require("node.core.Event.UIEvent");
 ---@param y number
 ---@return Drawable
 local function HitObject(draw,x,y)
-    if not draw.visible or draw.destroyed or not draw.mouseEnabled then
+    if not draw.visible or draw.destroyed then
         return false
     end
 
@@ -24,6 +24,9 @@ local function HitObject(draw,x,y)
     local hit = false
     if(Utils.pointHitRect(tx,ty,-draw.pivotX,-draw.pivotY,draw.width,draw.height))then
         hit = draw
+        if not draw.mouseEnabled then
+            return hit
+        end
         if draw.components then
             for i = draw:numChild(),1,-1 do
                 local child = draw:getChildAt(i);
@@ -61,18 +64,21 @@ end
 ---@param y number
 function stage.mouseEvent(this,type,x,y)
     local hit = HitObject(this,x,y)
-    if hit and hit ~= Stage then
+    if hit and hit ~= Stage and hit.mouseEnabled then
         if type == UIEvent.MOUSE_DOWN then
-            this.pressNode = hit
-        end
-        hit:event(type)
-        if type == UIEvent.MOUSE_UP then
+            this.pressNode = hit;
+        elseif type == UIEvent.MOUSE_UP then
             if this.pressNode == hit then
                 hit:event(UIEvent.CLICK)
-            else
-                this.pressNode:event(UIEvent.MOUSE_LEAVE_UP)
+                this.pressNode = nil
             end
+        elseif type == UIEvent.MOUSE_MOVE then
         end
+        hit:event(type)
+    end
+    if this.pressNode and type == UIEvent.MOUSE_UP then
+        this.pressNode:event(UIEvent.MOUSE_LEAVE_UP)
+        this.pressNode = nil
     end
     return this
 end
