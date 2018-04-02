@@ -54,7 +54,7 @@ function Sprite.ctor(this,skin)
     this:set("skin",function (v)
         this._skin = v;
         this._image = Loader:getImage(this._skin);
-        this:_repaint()
+        this:_updateSkin()
     end)
     this:get("skin",function ()
         return this._skin;
@@ -64,7 +64,7 @@ function Sprite.ctor(this,skin)
 
     this:set("sizeGrid", function (v)
         this._sizeGrid = v;
-        this:_repaint();
+        this:_updateSkin();
     end)
     this:get("sizeGrid",function ()
         return this._sizeGrid;
@@ -75,7 +75,7 @@ function Sprite.ctor(this,skin)
         if this._width ~= v then
             this._width = v;
             this.autoSize = false;
-            this:_repaint()
+            this:_onResize()
             this:_changeSize()
         end
     end)
@@ -94,7 +94,7 @@ function Sprite.ctor(this,skin)
         if this._height ~= v then
             this._height = v;
             this.autoSize = false;
-            this:_repaint()
+            this:_onResize()
             this:_changeSize()
         end
     end)
@@ -113,8 +113,7 @@ function Sprite.ctor(this,skin)
 end
 
 ---@param this Sprite
-function Sprite._repaint(this)
-    Component._repaint(this)
+function Sprite._updateSkin(this)
     if this._skin and this._sizeGrid then
         local grids =  Utils.splteText(this._sizeGrid,",");
         this:__setGrid(unpack(grids));
