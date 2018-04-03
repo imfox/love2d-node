@@ -153,6 +153,12 @@ end
 ---@param x number
 ---@param y number
 function Drawable.localToGlobal(this,x,y)
+    local parent = this;
+    while parent do
+        x = x  * parent.scaleX + (parent.x - parent.pivotX)
+        y = y + parent.y - parent.pivotY
+        parent = parent.parent;
+    end
     return x,y;
 end
 
@@ -182,8 +188,8 @@ function Drawable._render(this)
     love.graphics.setColor(r,g,b,this.alpha*255)
     push()
     translate(this.x,this.y)
-    scale(this.scaleX,this.scaleY)
     rotate(math.rad(this.rotation))
+    scale(this.scaleX,this.scaleY)
     this.graphics:_render();
     translate(-this.pivotX,-this.pivotY)
     table.sort(this.components,_sort)

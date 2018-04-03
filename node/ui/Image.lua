@@ -133,8 +133,8 @@ function Sprite._render(this)
 
     push()
     translate(this.x,this.y)
-    scale(this.scaleX,this.scaleY)
     rotate(math.rad(this.rotation))
+    scale(this.scaleX,this.scaleY)
     if this.gray or this.disabled then
         setShader(Constant.grayShader)
     end
