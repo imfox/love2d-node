@@ -8,6 +8,7 @@ local class = require("node.class");
 ---@type Message
 local Message = require("node.core.Display.Message");
 
+local exist = love.filesystem.getInfo
 
 ---@class Loader : Message
 local Loader = class(Message);
@@ -65,7 +66,7 @@ end
 ---@param skin string
 ---@return Image
 function Loader.getImage(this,skin)
-    if skin == "" or skin == nil or not love.filesystem.exists(skin) then
+    if skin == "" or skin == nil or not exist(skin) then
         return nil;
     end
     if this.images[skin] == nil then
@@ -79,7 +80,7 @@ end
 ---@param path string
 ---@return Font
 function Loader.getFont(this, path)
-    if path == "" or path == nil or not love.filesystem.exists(path) then
+    if path == "" or path == nil or not exist(path) then
         return nil;
     end
     if this.fonts[path] == nil then
