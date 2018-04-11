@@ -59,6 +59,8 @@ function Drawable.ctor(this)
 
 
     this.mouseEnabled = false;
+
+    this.transform = love.math.newTransform();
 end
 
 ---@param node Drawable
@@ -187,11 +189,18 @@ function Drawable._render(this)
     local r,g,b,a = love.graphics.getColor()
     love.graphics.setColor(r,g,b,this.alpha*255)
     push()
-    translate(this.x,this.y)
-    rotate(math.rad(this.rotation))
-    scale(this.scaleX,this.scaleY)
+    this.transform:reset();
+    this.transform:translate(this.x,this.y);
+    this.transform:rotate(math.rad(this.rotation));
+    this.transform:scale(this.scaleX,this.scaleY);
+    this.transform:translate(-this.pivotX,-this.pivotY);
+    love.graphics.applyTransform(this.transform)
+
+    --translate(this.x,this.y)
+    --rotate(math.rad(this.rotation))
+    --scale(this.scaleX,this.scaleY)
     this.graphics:_render();
-    translate(-this.pivotX,-this.pivotY)
+    --translate(-this.pivotX,-this.pivotY)
     table.sort(this.components,_sort)
     for _,drawable in ipairs(this.components) do
         if drawable._render then 
