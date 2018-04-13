@@ -26,13 +26,15 @@ function _timer.ctor(this, type, delay, count, caller, func, params)
     this.caller = caller
     this.func = func
     this.params = params
+
+    this.destroyed = false;
 end
 
 ---@param this _timer
 ---@param dt number
 ---@return boolean
 function _timer.update(this,dt)
-    if (this.count == 0) then
+    if (this.count == 0 or this.destroyed) then
         return
     end
     local delay = 1
@@ -69,13 +71,13 @@ local Timer = {}
 function Timer._updateAll(dt)
     if #timers > 0 then
         for i = #timers, 1, -1 do
-            if (timers[i] == nil) then
+            if (timers[i] == nil or timers[i].destroyed) then
                 table.remove(timers, i)
             end
         end
         for i = 1, #timers do
             if (timers[i]:update(dt)) then
-                timers[i] = nil
+                timers[i].destroyed = true;
             end
         end
     end
@@ -119,11 +121,32 @@ function Timer.frameCount(delay, count, caller, func, arg)
     return pushTimer("frame",delay , count, caller, func, arg)
 end
 
+
+---@return _timer
+---@param caller table
+---@param func Function
+---@param arg table
+function Timer.callLater(caller,func,arg)
+    ---@type _timer
+    local timer;
+    for i = #timers,1,-1 do   -- 会在render之前调用 并且只会调用一次
+        if (timers[i].type == "later" and not timers[i].destroyed and timers[i].caller == caller and timers[i].func == func) then
+            timer = timers[i];
+            timer.func = func
+            timer.arg = arg;
+        end
+    end
+    if not timer then
+        timer = pushTimer("later",0,1,caller,func,arg)
+    end
+    return
+end
+
 ---@return Timer
 function Timer.clear(caller, func)
     for i = 1, #timers do
         if (timers[i].caller == caller and timers[i].func == func) then
-            timers[i] = nil
+            timers[i].destroyed = true
         end
     end
     return Timer;
@@ -133,7 +156,7 @@ end
 function Timer.clearAll(caller)
     for i = 1, #timers do
         if (timers[i].caller == caller) then
-            timers[i] = nil
+            timers[i].destroyed = true
         end
     end
     return Timer;
