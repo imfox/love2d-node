@@ -9,6 +9,7 @@ local Utils = require("node.core.Utils.Utils");
 ---@type Node
 local Node = require("node.core.Display.Node");
 local Message = require("node.core.Display.Message")
+local Timer = require("node.core.Utils.Timer")
 ---@type Graphics
 local Graphics = require("node.core.Display.Graphics");
 local UIEvent = require("node.core.Event.UIEvent");
@@ -22,13 +23,73 @@ local Drawable = class(Node);
 ---@param this Drawable
 function Drawable.ctor(this)
     Node.ctor(this)
+    this.transform = love.math.newTransform();
+
+    this:set("x",function (v)
+        this._x = v;
+        this:_calcTransform()
+    end)
+    this:get("x",function ()
+        return this._x or 0;
+    end)
+
+    this:set("y",function (v)
+        this._y = v;
+        this:_calcTransform()
+    end)
+
+    this:get("y",function ()
+        return this._y or 0;
+    end)
+
+    this:set("scaleX",function (v)
+        this._scaleX = v or 1;
+        this:_calcTransform()
+    end)
+    this:get("scaleX",function ()
+        return this._scaleX or 1;
+    end)
+
+    this:set("scaleY",function (v)
+        this._scaleY = v or 1;
+        this:_calcTransform()
+    end)
+    this:get("scaleY",function ()
+        return this._scaleY or 1;
+    end)
+
+    this:set("pivotX",function (v)
+        this._pivotX = v;
+        this:_calcTransform()
+    end)
+    this:get("pivotX",function ()
+        return this._pivotX or 1;
+    end)
+
+    this:set("pivotY",function (v)
+        this._pivotY = v;
+        this:_calcTransform()
+    end)
+    this:get("pivotY",function ()
+        return this._pivotY or 0;
+    end)
+
+    this:set("rotation",function (v)
+        this._rotation = v;
+        this:_calcTransform()
+    end)
+    this:get("rotation",function ()
+        return this._rotation or 0;
+    end)
+
+    this.zOrder = 0;
     this.x = 0;
     this.y = 0;
-    this.zOrder = 0;
     this.scaleX = 1;
     this.scaleY = 1;
     this.pivotX = 0;
     this.pivotY = 0;
+
     --this.width = 0;
     --this.height = 0;
     this.alpha = 1;
@@ -60,7 +121,6 @@ function Drawable.ctor(this)
 
     this.mouseEnabled = false;
 
-    this.transform = love.math.newTransform();
 end
 
 ---@param node Drawable
@@ -189,18 +249,12 @@ function Drawable._render(this)
     local r,g,b,a = love.graphics.getColor()
     love.graphics.setColor(r,g,b,this.alpha*255)
     push()
-    this.transform:reset();
-    this.transform:translate(this.x,this.y);
-    this.transform:rotate(math.rad(this.rotation));
-    this.transform:scale(this.scaleX,this.scaleY);
-    this.transform:translate(-this.pivotX,-this.pivotY);
     love.graphics.applyTransform(this.transform)
-
     --translate(this.x,this.y)
     --rotate(math.rad(this.rotation))
     --scale(this.scaleX,this.scaleY)
-    this.graphics:_render();
     --translate(-this.pivotX,-this.pivotY)
+    this.graphics:_render();
     table.sort(this.components,_sort)
     for _,drawable in ipairs(this.components) do
         if drawable._render then 
@@ -212,6 +266,16 @@ function Drawable._render(this)
     return this;
 end
 
+---@param this Drawable
+function Drawable._calcTransform(this)
+    Timer.callLater(this,function (this)
+        this.transform:reset();
+        this.transform:translate(this.x,this.y);
+        this.transform:rotate(math.rad(this.rotation));
+        this.transform:scale(this.scaleX,this.scaleY);
+        this.transform:translate(-this.pivotX,-this.pivotY);
+    end,this)
+end
 ---@param this Drawable
 function Drawable._changeSize(this)
     this:event(UIEvent.RESIZE)
