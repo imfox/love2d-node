@@ -66,10 +66,10 @@ end
 ---@param skin string
 ---@return Image
 function Loader.getImage(this,skin)
-    if skin == "" or skin == nil or not exist(skin) then
-        return nil;
-    end
     if this.images[skin] == nil then
+        if skin == "" or skin == nil or not exist(skin) then
+            return nil;
+        end
         this.images[skin] = love.graphics.newImage(skin);
     end
     return this.images[skin];
@@ -78,15 +78,26 @@ end
 
 ---@param this Loader
 ---@param path string
+---@param name string
 ---@return Font
-function Loader.getFont(this, path)
-    if path == "" or path == nil or not exist(path) then
-        return nil;
+function Loader.loadFont(this, path, name)
+    if this.fonts[name] == nil then
+        if path == "" or path == nil or not exist(path) then
+            return nil;
+        end
+        this.fonts[name] = {font = love.graphics.newFont(path), path = path};
     end
-    if this.fonts[path] == nil then
-        this.fonts[path] = love.graphics.newFont(path);
+    return this.fonts[name];
+end
+
+---@param this Loader
+---@param name strng
+function Loader.getFont(this,name)
+    if not this.fonts[name] then
+        print("error: font file not exist ".. name);
+        return nil
     end
-    return this.fonts[path];
+    return this.fonts[name].font;
 end
 
 

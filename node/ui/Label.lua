@@ -30,6 +30,17 @@ function Label.ctor(this)
     this.align = "left";
     this.valign = "top";
     this.color = "#fff";
+    this._font = love.graphics.getFont()
+
+    this:set("font", function (v)
+        local font = Loader:getFont(v);
+        if not font then return end
+        this._font = font;
+    end)
+
+    this:get("font", function ()
+        return this._font;
+    end)
 end
 
 ---@field public graphics AutoBitmap
@@ -69,6 +80,8 @@ function Label._render(this)
     --        this.height = this.parent.height - (this.y-this.pivotY) - this.bottom;
     --    end
     --end
+
+    love.graphics.setFont(this.font);
 
     local x,y = 0,0;
     if this.valign == "middle" or this.valign  == "bottom" then
