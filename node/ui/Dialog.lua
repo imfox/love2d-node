@@ -4,15 +4,15 @@
 ---
 
 local class = require("node.class");
-local View = require("node.ui.View")
+local Box = require("node.ui.Box")
 local dialogManage = require("node.ui.DialogManage")
 
----@class Dialog : View
-local Dialog = class(View);
+---@class Dialog : Box
+local Dialog = class(Box);
 
 ---@param this View
 function Dialog.ctor(this)
-    View.ctor(this)
+    Box.ctor(this)
     this.dragArea = nil;
 end
 
