@@ -21,23 +21,24 @@ local DialogManage = class(Drawable);
 function DialogManage.ctor(this)
     Drawable.ctor(this)
     this.maskLayer = Drawable.new();
+    this.maskLayer.alpha = 0;
     this.visible = false;
 
     stage:on(UIEvent.RESIZE,function ()
         local w,h = stage.width,stage.height
         this:size(w,h)
         this.maskLayer:size(w,h)
-        this.maskLayer.graphics:clear()
-        this.maskLayer.alpha = 0.4;
-this.maskLayer.graphics:setColor(0x1,0x1,0x1,this.maskLayer.alpha * 255)
-this.maskLayer.graphics:rectangle("fill",0,0,w,h)
-this.maskLayer.graphics:setColor(255,255,255)
-end)
 
-this:addChild(this.maskLayer);
-this.zOrder = 1000;
-this.name = "dialogManage"
-stage:addChild(this);
+        this.maskLayer.graphics:clear()
+        this.maskLayer.graphics:setColor(0,0,0)
+        this.maskLayer.graphics:rectangle("fill",0,0,w,h)
+    end)
+
+    this:addChild(this.maskLayer);
+    this.zOrder = 1000;
+    this.name = "dialogManage"
+
+    stage:addChild(this);
 end
 
 ---@param this DialogManage
@@ -58,7 +59,7 @@ function DialogManage.open(this,dialog,center,anime)
         this.maskLayer.alpha = 0;
         this.maskLayer:removeSelf()
         this:addChild(this.maskLayer)
-        tween.to(this.maskLayer,{alpha=1},250,ease.linear);
+        tween.to(this.maskLayer,{alpha=0.4},250,ease.linear);
         tween.from(dialog,{x = stage.width/2,y =stage.height/2,scaleX= 0, scaleY=0},250,ease.outBack);
     end
 

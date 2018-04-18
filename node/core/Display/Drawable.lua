@@ -247,7 +247,7 @@ function Drawable._render(this)
         return this;
     end
     local r,g,b,a = love.graphics.getColor()
-    love.graphics.setColor(r,g,b,this.alpha*255)
+    love.graphics.setColor(r,g,b,this.alpha * a)
     push()
     love.graphics.applyTransform(this.transform)
     --translate(this.x,this.y)

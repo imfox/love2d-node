@@ -4,6 +4,34 @@
 ---
 local class = require("node.class");
 
+local recharge = love.graphics.rectangle
+
+local setLineWidth,getLineWidth,setColor,lprint,printf = love.graphics.setLineWidth,love.graphics.getLineWidth,love.graphics.setColor,love.graphics.print,love.graphics.printf
+
+---@param x number
+---@param y number
+---@param width number
+---@param height number
+---@param fillColor number
+---@param lineColor number
+---@param lineWidth number
+local function rect(x, y, width, height,fillColor,lineColor,lineWidth)
+    lineWidth = lineWidth or 1
+    lineColor = lineColor or "#fff"
+    setLineWidth(lineWidth);
+    if fillColor then
+        setColor(fillColor)
+        recharge("fill",x,y,width, height);
+    end
+    setColor(lineColor)
+    recharge("line",x,y,width, height);
+end
+
+local function fillText(text,x,y,align,width,color)
+    setColor(color)
+    printf(text,x,y,width,align,0,1,1,0,0,0,0);
+end
+
 
 --[[
     实际上这里应该放出接口 好让开发者有更多的扩展
@@ -100,8 +128,8 @@ end
 
 ---@param this Graphics
 ---@return Graphics
-function Graphics.setColor(this,r,g,b,a)
-    this:pushCmd("setColor",{r,g,b,a})
+function Graphics.setColor(this,r,g,b)
+    this:pushCmd("setColor",{r/255,g/255,b/255})
     return this;
 end
 
@@ -143,19 +171,6 @@ function Graphics.pushCmd(this, funcName,args)
     return this;
 end
 
----@param this Graphics
----@param x number
----@param y number
----@param r number
----@param w number
----@param h number
-function Graphics._begin(this,x,y,r,w,h)
-    love.graphics.push()
-    love.graphics.translate(x,y);
-    love.graphics.rotate(math.rad(r));
-    love.graphics.scale(w,h);
-    return this;
-end
 
 ---@param this Graphics
 ---@return Graphics
@@ -163,17 +178,18 @@ function Graphics._render(this)
     if this.one then
         love.graphics[this.one.cmd](unpack(this.one.args));
     end
-    if this.cmds then
+
+    if this.cmds and #this.cmds > 0 then
         for _, drawable in ipairs(this.cmds) do
-            love.graphics[drawable.cmd](unpack(drawable.args));
+            if(drawable.cmd == "setColor") then
+                local _,_,_,alpha = love.graphics.getColor()
+                local r,g,b = unpack(drawable.args);
+                love.graphics[drawable.cmd](r,g,b,alpha);
+            else
+                love.graphics[drawable.cmd](unpack(drawable.args));
+            end
         end
     end
-    return this;
-end
-
----@param this Graphics
-function Graphics._end(this)
-    love.graphics.pop();
     return this;
 end
 
