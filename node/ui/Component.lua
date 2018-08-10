@@ -3,6 +3,9 @@
 --- DateTime: 2018/3/20 21:09
 ---
 local class = require("node.class");
+local Constant = require("node.core.Utils.Constant")
+
+local setShader,translate,scale,draw,pop,push,rotate = love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate
 
 ---@type Drawable
 local Drawable = require("node.core.Display.Drawable")
@@ -185,6 +188,21 @@ function Component._onResize(this)
         end
     end
 
+end
+
+function Component:_push(...)
+    if self.gray or self.disabled then
+        setShader(Constant.grayShader)
+    end
+    return Drawable._push(self,...);
+end
+
+function Component:_pop(...)
+    Drawable._pop(self,...);
+    if self.gray or self.disabled then
+        setShader()
+    end
+    return self;
 end
 
 ---@param this Component

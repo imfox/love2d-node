@@ -246,24 +246,40 @@ function Drawable._render(this)
     if not this.visible or this.destroyed or this.alpha == 0 or this.scaleY ==0 or this.scaleX == 0 then    -- 已经不会显示出来了
         return this;
     end
-    local r,g,b,a = love.graphics.getColor()
-    love.graphics.setColor(r,g,b,this.alpha * a)
-    push()
-    love.graphics.applyTransform(this.transform)
-    --translate(this.x,this.y)
-    --rotate(math.rad(this.rotation))
-    --scale(this.scaleX,this.scaleY)
-    --translate(-this.pivotX,-this.pivotY)
-    this.graphics:_render();
-    table.sort(this.components,_sort)
+    local r,g,b,a = this:_push()
+    if this._draw then
+        this._draw(this);
+    end
+    this:_renderChildren();
+    return this:_pop(r,g,b,a)
+end
+
+function Drawable._renderChildren(this)
+    translate(-this.pivotX,-this.pivotY);
     for _,drawable in ipairs(this.components) do
         if drawable._render then 
             drawable:_render()
         end
     end
+end
+
+function Drawable._push(this)
+    local r,g,b,a = love.graphics.getColor()
+    love.graphics.setColor(r,g,b,this.alpha * a)
+    push()
+    love.graphics.applyTransform(this.transform);
+    return r,g,b,a;
+end
+---@return Drawable
+function Drawable._pop(this,r,g,b,a)
     love.graphics.setColor(r,g,b,a)
     pop()
     return this;
+end
+
+function Drawable:_draw()
+    self.graphics:_render();
+    table.sort(self.components,_sort)
 end
 
 ---@param this Drawable
@@ -273,7 +289,7 @@ function Drawable._calcTransform(this)
         this.transform:translate(this.x,this.y);
         this.transform:rotate(math.rad(this.rotation));
         this.transform:scale(this.scaleX,this.scaleY);
-        this.transform:translate(-this.pivotX,-this.pivotY);
+        -- this.transform:translate(-this.pivotX,-this.pivotY);
     end,this)
 end
 ---@param this Drawable

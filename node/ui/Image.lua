@@ -15,7 +15,7 @@ local Constant = require("node.core.Utils.Constant")
 local Component = require("node.ui.Component")
 
 
-local newQuad_,setShader,translate,scale,draw,pop,push,rotate = love.graphics.newQuad,love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate
+local newQuad_,translate,scale,draw,pop,push,rotate = love.graphics.newQuad,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate
 
 ---newQuad
 ---@param quad Quad
@@ -111,6 +111,9 @@ function Sprite.ctor(this,skin)
 
 
     this.skin = skin;
+
+    this._drawMode = nil;
+    
 end
 
 ---@param this Sprite
@@ -121,75 +124,51 @@ function Sprite._updateSkin(this)
     end
 end
 
----@field public graphics AutoBitmap
----@field public parent Drawable
-
----@param this Sprite
 ---@return Sprite
-function Sprite._render(this)
-    if not this.visible or this.destroyed or this.alpha == 0 or this.scaleY ==0 or this.scaleX == 0 then    -- 已经不会显示出来了
-        return this;
-    end
-
-    push()
-    translate(this.x,this.y)
-    rotate(math.rad(this.rotation))
-    scale(this.scaleX,this.scaleY)
-    if this.gray or this.disabled then
-        setShader(Constant.grayShader)
-    end
-
-    if this._image ~= nil then
-        this.graphics:clear();
-
-        ---@type Image
-        local img = this._image;
-        local width = img:getWidth()
-        local height = img:getHeight()
-
-        if this._sizeGrid == nil then
-            local sx = this.width / width;
-            local sy = this.height / height;
-            draw(img,0,0,0,sx,sy,this.pivotX/sx,this.pivotY/sy)
+function Sprite:_draw()
+    if self._image ~= nil then
+        if self._drawMode == 1 then
+            -- todo: 这里应该设置平铺显示
         else
-            local gridCenterWidth = width - this._grid[1] - this._grid[3]
-            local gridCenterHeight = height - this._grid[2] - this._grid[4]
+            self.graphics:clear();
 
-            local scaleXGroup = {1, (this.width - this._grid[1] - this._grid[3]) / gridCenterWidth, 1}
-            local scaleYGroup = {1, (this.height - this._grid[2] - this._grid[4]) / gridCenterHeight, 1}
-            local xGroup = {0, this._grid[1], this.width - this._grid[3]}
-            local yGroup = {this.height - this._grid[4], this._grid[2], 0}
-            for i = 1, 3 do
-                for n = 1, 3 do
-                    local j = (i-1) * 3 + n
-                    if (this._grid_quad[j]) then
-                        draw(
-                        img,
-                        this._grid_quad[j],
-                        (-(this.pivotX * this.scaleX) + (xGroup[n] * this.scaleX)),
-                        (-(this.pivotY * this.scaleY) + (yGroup[i] * this.scaleY)),
-                        0,
-                        this.scaleX * scaleXGroup[n],
-                        this.scaleY * scaleYGroup[i])
+            ---@type Image
+            local img = self._image;
+            local width = img:getWidth()
+            local height = img:getHeight()
+
+            if self._sizeGrid == nil then
+                local sx = self.width / width;
+                local sy = self.height / height;
+                draw(img,0,0,0,sx,sy,self.pivotX/sx,self.pivotY/sy)
+            else
+                local gridCenterWidth = width - self._grid[1] - self._grid[3]
+                local gridCenterHeight = height - self._grid[2] - self._grid[4]
+
+                local scaleXGroup = {1, (self.width - self._grid[1] - self._grid[3]) / gridCenterWidth, 1}
+                local scaleYGroup = {1, (self.height - self._grid[2] - self._grid[4]) / gridCenterHeight, 1}
+                local xGroup = {0, self._grid[1], self.width - self._grid[3]}
+                local yGroup = {self.height - self._grid[4], self._grid[2], 0}
+                for i = 1, 3 do
+                    for n = 1, 3 do
+                        local j = (i-1) * 3 + n
+                        if (self._grid_quad[j]) then
+                            draw(
+                            img,
+                            self._grid_quad[j],
+                            (-(self.pivotX * self.scaleX) + (xGroup[n] * self.scaleX)),
+                            (-(self.pivotY * self.scaleY) + (yGroup[i] * self.scaleY)),
+                            0,
+                            self.scaleX * scaleXGroup[n],
+                            self.scaleY * scaleYGroup[i])
+                        end
                     end
                 end
             end
         end
     end
-
-    this.graphics:_render();
-    translate(-this.pivotX,-this.pivotY)
-
-    for _,drawable in ipairs(this.components) do
-        if drawable._render then
-            drawable:_render()
-        end
-    end
-    if this.gray or this.disabled then
-        setShader()
-    end
-    pop()
-    return this;
+    self.graphics:_render();
+    return self;
 end
 
 ---grid
