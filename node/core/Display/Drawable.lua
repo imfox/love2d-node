@@ -10,8 +10,7 @@ local Utils = require("node.core.Utils.Utils");
 local Node = require("node.core.Display.Node");
 local Message = require("node.core.Display.Message")
 local Timer = require("node.core.Utils.Timer")
----@type Graphics
-local Graphics = require("node.core.Display.Graphics");
+
 local UIEvent = require("node.core.Event.UIEvent");
 
 local setShader,translate,scale,draw,pop,push,rotate = love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate
@@ -95,7 +94,6 @@ function Drawable.ctor(this)
     this.alpha = 1;
     this.rotation = 0;
     this.visible = true;
-    this.graphics = Graphics.new();
     this.id =  Utils.getGID();
 
     this._width = nil
@@ -250,6 +248,7 @@ function Drawable._render(this)
     if this._draw then
         this._draw(this);
     end
+    table.sort(this.components,_sort)
     this:_renderChildren();
     return this:_pop(r,g,b,a)
 end
@@ -278,8 +277,6 @@ function Drawable._pop(this,r,g,b,a)
 end
 
 function Drawable:_draw()
-    self.graphics:_render();
-    table.sort(self.components,_sort)
 end
 
 ---@param this Drawable

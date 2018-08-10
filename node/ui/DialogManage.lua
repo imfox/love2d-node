@@ -22,16 +22,18 @@ function DialogManage.ctor(this)
     Drawable.ctor(this)
     this.maskLayer = Drawable.new();
     this.maskLayer.alpha = 0;
+    -- 重写 _drawLayer 方法 使之画出黑背景
+    this.maskLayer._draw = function (this) 
+        love.graphics.setColor(0,0,0,this.alpha);
+        love.graphics.rectangle("fill",0,0,this.width,this.height);
+    end
+
     this.visible = false;
 
     stage:on(UIEvent.RESIZE,function ()
         local w,h = stage.width,stage.height
         this:size(w,h)
         this.maskLayer:size(w,h)
-
-        this.maskLayer.graphics:clear()
-        this.maskLayer.graphics:setColor(0,0,0)
-        this.maskLayer.graphics:rectangle("fill",0,0,w,h)
     end)
 
     this:addChild(this.maskLayer);

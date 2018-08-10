@@ -130,8 +130,6 @@ function Sprite:_draw()
         if self._drawMode == 1 then
             -- todo: 这里应该设置平铺显示
         else
-            self.graphics:clear();
-
             ---@type Image
             local img = self._image;
             local width = img:getWidth()
@@ -167,7 +165,6 @@ function Sprite:_draw()
             end
         end
     end
-    self.graphics:_render();
     return self;
 end
 
