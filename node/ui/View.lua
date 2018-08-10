@@ -7,6 +7,10 @@ local class = require("node.class");
 ---@type Component
 local Component = require("node.ui.Component")
 
+local function getUIViewClassName(source)
+    return string.gsub(source,".ui","UI"):gsub("\\","_"):gsub("/","_"):gsub('%.',"_");
+end
+
 ---@class View : Component
 local View = class(Component);
 
@@ -24,10 +28,15 @@ local Dialog = require("node.ui.Dialog");
 
 local uiClass = {}
 
----@param className string
-function getInstance(className)
-    if uiClass[className] then
-        return uiClass[className].new();
+---@param type string
+function getInstance(type,data)
+    if type == "UIView" and data.type == "UIView" then
+        type = getUIViewClassName(data.source);
+    end
+    if uiClass[type] then
+        return uiClass[type].new();
+    else
+        print("error: no exist class "..type)
     end
     return Box.new()
 end
@@ -44,7 +53,7 @@ function createComp(table,node,root)
 
     local props = table.props;
     if not node then
-        node = getInstance(table.type);
+        node = getInstance(table.type,table);
     end
 
     local childs = table.child;
@@ -85,14 +94,11 @@ function regComponent(className,class)
     uiClass[className] = class;
 end
 
-
-
 regComponent("Image",Image)
 regComponent("Label",Label)
 regComponent("ScaleButton",ScaleButton)
 regComponent("Dialog",Dialog)
 regComponent("Box",Box)
-
 
 View.createComp = createComp;
 View.regComponent = regComponent;
