@@ -16,8 +16,6 @@ local Component = require("node.ui.Component")
 
 local Utils = require("node.core.Utils.Utils")
 
-local setShader,translate,scale,printf,pop,push,rotate = love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.printf,love.graphics.pop,love.graphics.push,love.graphics.rotate
-
 
 ---@class Label : Component
 local Label = class(Component)
@@ -44,19 +42,19 @@ function Label.ctor(this)
 end
 
 ---@return Label
-function Label._draw(this)
-    love.graphics.setFont(this.font);
+function Label._draw(this,graphics)
+    graphics.setFont(this.font);
 
     local x,y = 0,0;
     if this.valign == "middle" or this.valign  == "bottom" then
-        local h = this.height - love.graphics.getFont():getHeight() * #(Utils.splteText(this.text,"\n"));
+        local h = this.height - graphics.getFont():getHeight() * #(Utils.splteText(this.text,"\n"));
         y =  h / (this.valign=="middle"and 2 or 1);
         if y < 0 then
             y = 0
         end
     end
 
-    printf(this.text,x,y,this.width,this.align,0,1,1,this.pivotX,this.pivotY)
+    graphics.printf(this.text,x,y,this.width,this.align,0,1,1,this.pivotX,this.pivotY)
     return this;
 end
 

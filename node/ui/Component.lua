@@ -5,8 +5,6 @@
 local class = require("node.class");
 local Constant = require("node.core.Utils.Constant")
 
-local setShader,translate,scale,draw,pop,push,rotate = love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate
-
 ---@type Drawable
 local Drawable = require("node.core.Display.Drawable")
 

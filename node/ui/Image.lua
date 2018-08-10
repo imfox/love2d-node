@@ -15,7 +15,7 @@ local Constant = require("node.core.Utils.Constant")
 local Component = require("node.ui.Component")
 
 
-local newQuad_,translate,scale,draw,pop,push,rotate = love.graphics.newQuad,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate
+local newQuad_ = love.graphics.newQuad
 
 ---newQuad
 ---@param quad Quad
@@ -125,7 +125,7 @@ function Sprite._updateSkin(this)
 end
 
 ---@return Sprite
-function Sprite:_draw()
+function Sprite:_draw(graphics)
     if self._image ~= nil then
         if self._drawMode == 1 then
             -- todo: 这里应该设置平铺显示
@@ -138,7 +138,7 @@ function Sprite:_draw()
             if self._sizeGrid == nil then
                 local sx = self.width / width;
                 local sy = self.height / height;
-                draw(img,0,0,0,sx,sy,self.pivotX/sx,self.pivotY/sy)
+                graphics.draw(img,0,0,0,sx,sy,self.pivotX/sx,self.pivotY/sy)
             else
                 local gridCenterWidth = width - self._grid[1] - self._grid[3]
                 local gridCenterHeight = height - self._grid[2] - self._grid[4]
@@ -151,7 +151,7 @@ function Sprite:_draw()
                     for n = 1, 3 do
                         local j = (i-1) * 3 + n
                         if (self._grid_quad[j]) then
-                            draw(
+                            graphics.draw(
                             img,
                             self._grid_quad[j],
                             (-(self.pivotX * self.scaleX) + (xGroup[n] * self.scaleX)),

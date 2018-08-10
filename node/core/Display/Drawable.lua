@@ -13,8 +13,7 @@ local Timer = require("node.core.Utils.Timer")
 
 local UIEvent = require("node.core.Event.UIEvent");
 
-local setShader,translate,scale,draw,pop,push,rotate = love.graphics.setShader,love.graphics.translate,love.graphics.scale,love.graphics.draw,love.graphics.pop,love.graphics.push,love.graphics.rotate
-
+local translate,pop,push = love.graphics.translate,love.graphics.pop,love.graphics.push
 
 ---@class Drawable : Node
 local Drawable = class(Node);
@@ -240,24 +239,24 @@ end
 
 ---@param this Drawable
 ---@return Drawable
-function Drawable._render(this)
+function Drawable._render(this,graphics)
     if not this.visible or this.destroyed or this.alpha == 0 or this.scaleY ==0 or this.scaleX == 0 then    -- 已经不会显示出来了
         return this;
     end
     local r,g,b,a = this:_push()
     if this._draw then
-        this._draw(this);
+        this._draw(this,graphics);
     end
     table.sort(this.components,_sort)
-    this:_renderChildren();
+    this:_renderChildren(graphics);
     return this:_pop(r,g,b,a)
 end
-
-function Drawable._renderChildren(this)
+---@param graphics graphics
+function Drawable._renderChildren(this,graphics)
     translate(-this.pivotX,-this.pivotY);
     for _,drawable in ipairs(this.components) do
         if drawable._render then 
-            drawable:_render()
+            drawable:_render(graphics)
         end
     end
 end
@@ -276,7 +275,8 @@ function Drawable._pop(this,r,g,b,a)
     return this;
 end
 
-function Drawable:_draw()
+---@param graphics graphics
+function Drawable:_draw(graphics)
 end
 
 ---@param this Drawable

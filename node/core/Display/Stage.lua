@@ -109,7 +109,7 @@ end
 
 ---@param this stage
 function stage.draw(this)
-    this:_render()
+    this:_render(love.graphics)
     local status = love.graphics.getStats()
     love.window.setTitle(string.format("fps:%d  images:%d  drawcalls:%d",love.timer.getFPS(),status.images,status.drawcalls))
     --drawRect(this,0,0,0,1,1,0,0);
