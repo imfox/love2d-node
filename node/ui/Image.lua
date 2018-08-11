@@ -116,49 +116,83 @@ function Sprite.ctor(this,skin)
     
 end
 
+function Sprite:_onResize()
+    Component._onResize(self);
+    self:_updateSkin()
+end
+
 ---@param this Sprite
 function Sprite._updateSkin(this)
     if this._skin and this._sizeGrid then
         local grids =  Utils.splteText(this._sizeGrid,",");
+        if #grids >= 5 and grids[5] == "1" then
+            this._drawMode = 1;
+        end
         this:__setGrid(unpack(grids));
+    end
+end
+
+local function _fill(draw,img,quad,x,y,width,height)
+    local bx = x;
+    local by = y;
+    local qx,qy,qw,qh = quad:getViewport();
+    local bh = height
+    while bh > 0 do
+        local bw = width
+        if bh < qh then
+            quad:setViewport(qx,qy,bw,bh)
+        end
+        while bw > 0 do
+            if bw < qw then 
+                quad:setViewport(qx,qy,bw,qh)
+            end
+            draw(img,quad,bx+width-bw,by+height-bh,0,1,1);
+            bw = bw - qw;
+        end
+        bh = bh - qh;
+        quad:setViewport(qx,qy,qw,qh)
     end
 end
 
 ---@return Sprite
 function Sprite:_draw(graphics)
     if self._image ~= nil then
-        if self._drawMode == 1 then
-            -- todo: 这里应该设置平铺显示
+        ---@type Image
+        local img = self._image;
+        local width = img:getWidth()
+        local height = img:getHeight()
+
+        if self._sizeGrid == nil then
+            local sx = self.width / width;
+            local sy = self.height / height;
+            graphics.draw(img,0,0,0,sx,sy,self.pivotX/sx,self.pivotY/sy)
         else
-            ---@type Image
-            local img = self._image;
-            local width = img:getWidth()
-            local height = img:getHeight()
+            local gridCenterWidth = width - self._grid[1] - self._grid[3]
+            local gridCenterHeight = height - self._grid[2] - self._grid[4]
 
-            if self._sizeGrid == nil then
-                local sx = self.width / width;
-                local sy = self.height / height;
-                graphics.draw(img,0,0,0,sx,sy,self.pivotX/sx,self.pivotY/sy)
-            else
-                local gridCenterWidth = width - self._grid[1] - self._grid[3]
-                local gridCenterHeight = height - self._grid[2] - self._grid[4]
+            local scaleXGroup = {1, (self.width - self._grid[1] - self._grid[3]) / gridCenterWidth, 1}
+            local scaleYGroup = {1, (self.height - self._grid[2] - self._grid[4]) / gridCenterHeight, 1}
+            local xGroup = {0, self._grid[1], self.width - self._grid[3]}
+            local yGroup = {self.height - self._grid[4], self._grid[2], 0}
 
-                local scaleXGroup = {1, (self.width - self._grid[1] - self._grid[3]) / gridCenterWidth, 1}
-                local scaleYGroup = {1, (self.height - self._grid[2] - self._grid[4]) / gridCenterHeight, 1}
-                local xGroup = {0, self._grid[1], self.width - self._grid[3]}
-                local yGroup = {self.height - self._grid[4], self._grid[2], 0}
-                for i = 1, 3 do
-                    for n = 1, 3 do
-                        local j = (i-1) * 3 + n
-                        if (self._grid_quad[j]) then
-                            graphics.draw(
-                            img,
-                            self._grid_quad[j],
-                            (-(self.pivotX * self.scaleX) + (xGroup[n] * self.scaleX)),
-                            (-(self.pivotY * self.scaleY) + (yGroup[i] * self.scaleY)),
-                            0,
-                            self.scaleX * scaleXGroup[n],
-                            self.scaleY * scaleYGroup[i])
+            local dw,dh;
+            if self._drawMode == 1 then 
+                dw = {self._grid[1],gridCenterWidth,self._grid[3]};
+                dh = {self._grid[4],gridCenterHeight, self._grid[2]};
+            end
+
+            local j,quad;
+            for i = 1, 3 do
+                for n = 1, 3 do
+                    j = (i-1) * 3 + n
+                    quad = self._grid_quad[j];
+                    if (quad) then
+                        local bx = (-(self.pivotX * self.scaleX) + (xGroup[n] * self.scaleX));
+                        local by = (-(self.pivotY * self.scaleY) + (yGroup[i] * self.scaleY));
+                        if self._drawMode == 1 then
+                            _fill(graphics.draw,img,quad,bx,by,self.scaleX*scaleXGroup[n]*dw[n],self.scaleY*scaleYGroup[i]*dh[i])
+                        else
+                            graphics.draw(img,quad,bx,by,0,self.scaleX*scaleXGroup[n],self.scaleY*scaleYGroup[i])
                         end
                     end
                 end
