@@ -16,6 +16,8 @@ local Component = require("node.ui.Component")
 
 local Utils = require("node.core.Utils.Utils")
 
+---@type node2d_utils_font
+local Font = require("node.core.utils.Font")
 
 ---@class Label : Component
 local Label = class(Component)
@@ -29,9 +31,9 @@ function Label.ctor(this)
     this.valign = "top";
     this.color = "#fff";
     this._font = love.graphics.getFont()
-
+    
     this:set("font", function (v)
-        local font = Loader:getFont(v);
+        local font = Font:getFont(v);
         if not font then return end
         this._font = font;
     end)

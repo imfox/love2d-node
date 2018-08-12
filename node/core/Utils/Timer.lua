@@ -5,7 +5,7 @@
 local class = require("node.class");
 local globalScale = 1
 
----@class _timer
+---@class _timer : Klass
 local _timer = class()
 
 ---@param this _timer
@@ -14,7 +14,7 @@ local _timer = class()
 ---@param count number
 ---@param caller table
 ---@param func func
----@param params table 这里的params是参数数组 会使用unpack解开
+---@param params table @这里的params是参数数组 会使用unpack解开
 function _timer.ctor(this, type, delay, count, caller, func, params)
     this.m_scale = 1
     this.time = 0
@@ -66,8 +66,9 @@ end
 ---@type _timer[]
 local timers = {}
 
----@type class
+---@class node_Timer
 local Timer = {}
+---@private
 function Timer._updateAll(dt)
     if #timers > 0 then
         for i = #timers, 1, -1 do

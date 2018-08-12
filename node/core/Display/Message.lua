@@ -5,7 +5,7 @@
 
 ---@class EventType
 ---@field public func func
----@field public args []
+---@field public args any[]
 ---@field public count number
 
 local class = require("node.class");
@@ -22,7 +22,7 @@ end
 ---@param this Message
 ---@param type string
 ---@param func func
----@param args []
+---@param args any[]
 function Message.on(this,type,func,args)
     if not this._events then
         this._events = {};
@@ -36,7 +36,7 @@ end
 ---@param this Message
 ---@param type string
 ---@param func func
----@param args []
+---@param args any[]
 function Message.once(this,type,func,args)
     if not this._events then
         this._events = {};
@@ -49,7 +49,7 @@ end
 
 ---@param this Message
 ---@param type string
----@param args []
+---@param args any[]
 function Message.event(this,type,args)
     if not this._events or not this._events[type] then return this end
     for _,event in ipairs(this._events[type]) do

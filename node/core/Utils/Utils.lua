@@ -107,5 +107,48 @@ function Utils.getGID()
     return gid;
 end
 
+---@return fun()
+---@param func fun()
+---@param caller any
+---@param ... any[]
+function Utils.call(func,caller,...)
+    local args = {...}
+    if caller then 
+        return function ()
+            return func(caller,unpack(args))
+        end
+    end
+    return function ()
+        return func(unpack(args))
+    end 
+end
+
+
+--获取路径
+function Utils.stripFilename(filename)
+	return string.match(filename, "(.+)/[^/]*%.%w+$") --*nix system
+	--return string.match(filename, “(.+)\\[^\\]*%.%w+$”) — windows
+end
+ 
+--获取文件名
+function Utils.stripPath(filename)
+	return string.match(filename, ".+/([^/]*%.%w+)$") -- *nix system
+	--return string.match(filename, “.+\\([^\\]*%.%w+)$”) — *nix system
+end
+ 
+--去除扩展名
+function Utils.stripExtension(filename)
+	local idx = filename:match(".+()%.%w+$")
+	if(idx) then
+		return filename:sub(1, idx-1)
+	else
+		return filename
+	end
+end
+ 
+--获取扩展名
+function Utils.getExtension(filename)
+	return filename:match(".+%.(%w+)$")
+end
 
 return Utils;

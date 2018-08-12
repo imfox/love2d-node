@@ -8,6 +8,7 @@
 local Utils = require("node.core.Utils.Utils")
 local clone = Utils.tableClone
 
+---@return Klass
 local function class(...) -- super list
     local cls
     local superList = {...}

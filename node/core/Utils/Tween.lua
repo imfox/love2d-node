@@ -118,7 +118,7 @@ end
 local tweens = {}
 ---@param subject table
 ---@param target table
----@param duration number ms
+---@param duration number @ms
 ---@param easing func
 ---@param complete func
 function tween.to(subject, target, duration, easing, complete)
@@ -141,7 +141,7 @@ end
 
 ---@param subject table
 ---@param from table
----@param duration number ms
+---@param duration number @ms
 ---@param easing func
 ---@param complete func
 function tween.from(subject, from, duration ,easing, complete)

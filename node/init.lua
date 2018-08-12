@@ -31,6 +31,9 @@ local Image = require("node.ui.Image");
 local UIEvent = require("node.core.Event.UIEvent");
 local UIUtils = require("node.core.Utils.UiUtils");
 
+---@type node2d_utils_font
+local Font = require("node.core.utils.Font")
+
 local sclaeX, sclaeY = 1, 1
 local offsetX, offsetY = 0, 0
 local function resize( w, h)
@@ -136,7 +139,7 @@ end
 
 local function focus(b)
 end
-
+---@type Node2d
 local export = {
     version = 0.1,
     versionName = "node",
@@ -149,6 +152,7 @@ local export = {
     UIEvent = UIEvent,
     UIUtils = UIUtils,
     Ease = Ease,
+    Font = Font,
 
     View = View,
     Dialog = Dialog,
@@ -161,6 +165,7 @@ local export = {
 
     --@public
     register = nil,
+    init = nil,
     load = load,
     update = update,
     draw = draw,
@@ -178,7 +183,7 @@ local export = {
 
 }
 
-local function init(this,title,width,height)
+local function init(self,title,width,height)
     love.window.setTitle(title);
     stage.width = width;
     stage.height = height;
@@ -188,7 +193,7 @@ end
 
 setmetatable(export,{__call=init})
 
-local function register()
+local function register(self)
     local funcs = {"load","update","draw","focus","resize","keypressed","keyreleased","wheelmoved"};
 
     local touchFuncs = {"mousemoved","mousepressed","mousereleased"}
@@ -207,5 +212,6 @@ local function register()
 end
 
 export.register = register;
+export.init = init;
 
 return export;

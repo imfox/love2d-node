@@ -188,6 +188,7 @@ function Component._onResize(this)
 
 end
 
+---@private
 function Component:_push(...)
     if self.gray or self.disabled then
         setShader(Constant.grayShader)
@@ -195,6 +196,7 @@ function Component:_push(...)
     return Drawable._push(self,...);
 end
 
+---@private
 function Component:_pop(...)
     Drawable._pop(self,...);
     if self.gray or self.disabled then
@@ -203,6 +205,7 @@ function Component:_pop(...)
     return self;
 end
 
+---@private
 ---@param this Component
 function Component._repaintChilds(this)
     this:_onResize()

@@ -157,6 +157,7 @@ end
 ---@param destroyChild boolean
 ---@return void
 function Node.destroy(this,destroyChild)
+    if this.destroyed then return end
     this.destroyed = true;
     this:removeSelf();
     if destroyChild ~= false then

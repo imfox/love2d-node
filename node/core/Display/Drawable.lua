@@ -131,8 +131,8 @@ end
 
 ---@param this Drawable
 ---@param type string
-function Drawable.on(this,type,...)
-    Message.on(this,type,...)
+function Drawable.on(this,type,func,args)
+    Message.on(this,type,func,args)
     if UIEvent.isMouseEvent(type) then
         _mouseEnable(this);
     end
@@ -237,6 +237,7 @@ local function _sort(a,b)
     return a.zOrder < b.zOrder;
 end
 
+---@protected
 ---@param this Drawable
 ---@return Drawable
 function Drawable._render(this,graphics)
@@ -251,6 +252,8 @@ function Drawable._render(this,graphics)
     this:_renderChildren(graphics);
     return this:_pop(r,g,b,a)
 end
+
+---@protected
 ---@param graphics graphics
 function Drawable._renderChildren(this,graphics)
     translate(-this.pivotX,-this.pivotY);
@@ -261,6 +264,7 @@ function Drawable._renderChildren(this,graphics)
     end
 end
 
+---@protected
 function Drawable._push(this)
     local r,g,b,a = love.graphics.getColor()
     love.graphics.setColor(r,g,b,this.alpha * a)
@@ -268,6 +272,8 @@ function Drawable._push(this)
     love.graphics.applyTransform(this.transform);
     return r,g,b,a;
 end
+
+---@protected
 ---@return Drawable
 function Drawable._pop(this,r,g,b,a)
     love.graphics.setColor(r,g,b,a)
@@ -275,10 +281,12 @@ function Drawable._pop(this,r,g,b,a)
     return this;
 end
 
+---@protected
 ---@param graphics graphics
 function Drawable:_draw(graphics)
 end
 
+---@protected
 ---@param this Drawable
 function Drawable._calcTransform(this)
     Timer.callLater(this,function (this)
@@ -289,6 +297,8 @@ function Drawable._calcTransform(this)
         -- this.transform:translate(-this.pivotX,-this.pivotY);
     end,this)
 end
+
+---@protected
 ---@param this Drawable
 function Drawable._changeSize(this)
     this:event(UIEvent.RESIZE)

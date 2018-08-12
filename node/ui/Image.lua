@@ -51,15 +51,12 @@ local Sprite = class(Component)
 ---@param skin string
 function Sprite.ctor(this,skin)
     Component.ctor(this)
+
     this:set("skin",function (v)
         this._skin = v;
-        this._image = Loader:getImage(this._skin);
-        this:_onResize()
-        this:_updateSkin()
+        Loader:load(this._skin,Loader.IMAGE,true,Utils.call(this._onLoad,this));
     end)
-    this:get("skin",function ()
-        return this._skin;
-    end)
+    this:get("skin",function () return this._skin; end)
 
     this._sizeGrid = nil
 
@@ -67,9 +64,7 @@ function Sprite.ctor(this,skin)
         this._sizeGrid = v;
         this:_updateSkin();
     end)
-    this:get("sizeGrid",function ()
-        return this._sizeGrid;
-    end )
+    this:get("sizeGrid",function () return this._sizeGrid; end )
 
     this._width = 0
     this:set("width", function (v)
@@ -114,6 +109,14 @@ function Sprite.ctor(this,skin)
 
     this._drawMode = nil;
     
+end
+
+---@protected
+function Sprite:_onLoad()
+    if self._skin then 
+        self._image = Loader:getRes(self._skin);
+        self:_onResize();
+    end
 end
 
 function Sprite:_onResize()
@@ -211,7 +214,7 @@ end
 ---@return Sprite
 ---@protected
 function Sprite.__setGrid(this , top, right, bottom, left)
-    if Loader:getImage(this.skin) == nil then
+    if this._image == nil then
         return this;
     end
 
@@ -225,7 +228,7 @@ function Sprite.__setGrid(this , top, right, bottom, left)
     local left, top, right, bottom = unpack(this._grid);
 
 
-    local img = Loader:getImage(this.skin);
+    local img = this._image;
     local width, height = img:getWidth(), img:getHeight()
     this._grid_quad = this._grid_quad or {}
     this._grid_quad[7] = newQuad(this._grid_quad[7], 0, 0, left, top, width, height) --　左下角
