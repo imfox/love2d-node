@@ -10,6 +10,8 @@ local Message = require("node.core.Display.Message");
 
 local exist = love.filesystem.getInfo
 
+local utils = require("node.core.Utils.Utils");
+
 ---@class Loader : Message
 local Loader = class(Message);
 
@@ -28,6 +30,8 @@ Loader.extKeys = {
     tab = Loader.TABLE,
     mp3 = Loader.SOUND,
     wav = Loader.SOUND,
+    tab = Loader.TABLE,
+    table = Loader.TABLE,
 }
 
 ---@private
@@ -59,11 +63,24 @@ function Loader:load(url,type_,cache,compile)
         return;
     end
 
+    if not type_ then
+        local ext = Loader.extKeys[utils.getExtension(url)];
+        if ext then 
+            type_ = ext;
+        end
+    end
     type_ = type_ or Loader.IMAGE;
     cache = cache or true;
 
     local data = self:getRes(url);
-    
+
+    if not data then 
+        if not love.filesystem.getInfo(url) then
+            print("error : not exits file:" .. url);
+            return 
+        end
+    end
+
     if not data then 
         if type_ == Loader.IMAGE then
             data = love.graphics.newImage(url);
@@ -77,7 +94,7 @@ function Loader:load(url,type_,cache,compile)
         elseif type_ == "IMAGEPACK" then
             -- 这里做切图
         else
-            print( string.format("error ; unknown type resource(不可识别的资源) type:%s path:%s",type_ ,url));
+            print( string.format("error : unknown type resource(不可识别的资源) type:%s path:%s",type_ ,url));
         end
         if cache then 
             self:cacheRes(url,data);
