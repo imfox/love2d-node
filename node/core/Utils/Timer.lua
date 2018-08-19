@@ -170,7 +170,13 @@ end
 -------------------------------------------------------
 ---@return number
 function Timer:getTimerCount()
-    return #timers
+    local count = 0;
+    for i = 1, #timers do
+        if timers[i].type ~= "later" then
+            count = count + 1
+        end
+    end
+    return count;
 end
 
 ---@param n number

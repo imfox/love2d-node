@@ -8,6 +8,7 @@ local Font = {}
 ---@private
 Font._caches = {}
 
+Font.defaultFont = love.graphics.getFont();
 ---@param name string
 ---@param font any
 function Font:register(name,font)
@@ -32,5 +33,6 @@ end
 function Font:_loaded(url,name)
     Font:register(name,Loader:getRes(url));
 end
+
 
 return Font;
