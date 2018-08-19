@@ -33,7 +33,7 @@ end
 ---@param this _timer
 ---@param dt number
 ---@return boolean
-function _timer.update(this,dt)
+function _timer.update(this, dt)
     if (this.count == 0 or this.destroyed) then
         return
     end
@@ -45,7 +45,7 @@ function _timer.update(this,dt)
         this.count = this.count - 1
         if (type(this.func) == "function") then
             if this.caller then
-                this.func(this.caller,this.params ~= nil and unpack(this.params) or nil)
+                this.func(this.caller, this.params ~= nil and unpack(this.params) or nil)
             else
                 this.func(this.params ~= nil and unpack(this.params) or nil)
             end
@@ -58,7 +58,7 @@ end
 ---@param this _timer
 ---@param n number
 ---@return _timer
-function _timer.scale(this,n)
+function _timer.scale(this, n)
     this.m_scale = n;
     return this;
 end
@@ -68,8 +68,12 @@ local timers = {}
 
 ---@class node_Timer
 local Timer = {}
+
+Timer.delta = 0;
+
 ---@private
-function Timer._updateAll(dt)
+function Timer:_updateAll(dt)
+    Timer.delta = dt;
     if #timers > 0 then
         for i = #timers, 1, -1 do
             if (timers[i] == nil or timers[i].destroyed) then
@@ -93,33 +97,33 @@ end
 --------------------------------------------------------
 
 ---@return _timer
-function Timer.once(delay, caller, func, arg)
-    return pushTimer("second",delay / 1000, 1, caller, func, arg)
+function Timer:once(delay, caller, func, arg)
+    return pushTimer("second", delay / 1000, 1, caller, func, arg)
 end
 
 ---@return _timer
-function Timer.loop(delay, caller, func, arg)
-    return pushTimer("second",delay / 1000, -1, caller, func, arg)
+function Timer:loop(delay, caller, func, arg)
+    return pushTimer("second", delay / 1000, -1, caller, func, arg)
 end
 
 ---@return _timer
-function Timer.frameOnce(delay, caller, func, arg)
-    return pushTimer("frame",delay , 1, caller, func, arg)
+function Timer:frameOnce(delay, caller, func, arg)
+    return pushTimer("frame", delay, 1, caller, func, arg)
 end
 
 ---@return _timer
-function Timer.frameLoop(delay, caller, func, arg)
-    return pushTimer("frame",delay , -1, caller, func, arg)
+function Timer:frameLoop(delay, caller, func, arg)
+    return pushTimer("frame", delay, -1, caller, func, arg)
 end
 
 ---@return _timer
-function Timer.count(delay, count, caller, func, arg)
-    return pushTimer("second",delay / 1000, count, caller, func, arg)
+function Timer:count(delay, count, caller, func, arg)
+    return pushTimer("second", delay / 1000, count, caller, func, arg)
 end
 
 ---@return _timer
-function Timer.frameCount(delay, count, caller, func, arg)
-    return pushTimer("frame",delay , count, caller, func, arg)
+function Timer:frameCount(delay, count, caller, func, arg)
+    return pushTimer("frame", delay, count, caller, func, arg)
 end
 
 
@@ -127,10 +131,11 @@ end
 ---@param caller table
 ---@param func Function
 ---@param arg table
-function Timer.callLater(caller,func,arg)
+function Timer:callLater(caller, func, arg)
     ---@type _timer
     local timer;
-    for i = #timers,1,-1 do   -- 会在render之前调用 并且只会调用一次
+    for i = #timers, 1, -1 do
+        -- 会在render之前调用 并且只会调用一次
         if (timers[i].type == "later" and not timers[i].destroyed and timers[i].caller == caller and timers[i].func == func) then
             timer = timers[i];
             timer.func = func
@@ -138,13 +143,13 @@ function Timer.callLater(caller,func,arg)
         end
     end
     if not timer then
-        timer = pushTimer("later",0,1,caller,func,arg)
+        timer = pushTimer("later", 0, 1, caller, func, arg)
     end
     return
 end
 
 ---@return Timer
-function Timer.clear(caller, func)
+function Timer:clear(caller, func)
     for i = 1, #timers do
         if (timers[i].caller == caller and timers[i].func == func) then
             timers[i].destroyed = true
@@ -154,7 +159,7 @@ function Timer.clear(caller, func)
 end
 
 ---@return Timer
-function Timer.clearAll(caller)
+function Timer:clearAll(caller)
     for i = 1, #timers do
         if (timers[i].caller == caller) then
             timers[i].destroyed = true
@@ -164,13 +169,13 @@ function Timer.clearAll(caller)
 end
 -------------------------------------------------------
 ---@return number
-function Timer.getTimerCount()
+function Timer:getTimerCount()
     return #timers
 end
 
 ---@param n number
 ---@return Timer
-function Timer.scale(n)
+function Timer:scale(n)
     globalScale = n
     return Timer;
 end

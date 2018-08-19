@@ -157,7 +157,9 @@ end
 ---@param index number
 function Component.addChildAt(this, node, index)
     Drawable.addChildAt(this,node,index)
-    node:_repaintChilds()
+    if node._repaintChilds then
+        node:_repaintChilds()
+    end
     return this;
 end
 

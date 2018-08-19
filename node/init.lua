@@ -31,6 +31,8 @@ local Image = require("node.ui.Image");
 local UIEvent = require("node.core.Event.UIEvent");
 local UIUtils = require("node.core.Utils.UiUtils");
 
+local Stat = require("node.core.Utils.Stat");
+
 ---@type node2d_utils_font
 local Font = require("node.core.utils.Font")
 
@@ -68,7 +70,7 @@ local function load( )
 end
 
 local function update(dt)
-    Timer._updateAll(dt);
+    Timer:_updateAll(dt);
     Tween._update(dt);
 end
 
@@ -162,6 +164,8 @@ local export = {
 
     --@type Stage
     stage = stage,
+    --@type node2d_s
+    Stat = Stat,
 
     --@public
     register = nil,

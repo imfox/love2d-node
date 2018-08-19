@@ -289,7 +289,7 @@ end
 ---@protected
 ---@param this Drawable
 function Drawable._calcTransform(this)
-    Timer.callLater(this,function (this)
+    Timer:callLater(this,function (this)
         this.transform:reset();
         this.transform:translate(this.x,this.y);
         this.transform:rotate(math.rad(this.rotation));

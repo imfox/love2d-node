@@ -10,7 +10,7 @@
 
 local class = require("node.class");
 
----@class Message
+---@class Message : Klass
 local Message = class();
 
 ---@param this Message
