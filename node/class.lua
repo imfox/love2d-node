@@ -9,9 +9,10 @@ local Utils = require("node.core.Utils.Utils")
 local clone = Utils.tableClone
 
 ---@return Klass
-local function class(...) -- super list
+local function class(...)
+    -- super list
     local cls
-    local superList = {...}
+    local superList = { ... }
 
     if (#superList > 0) then
         cls = clone(superList[1])
@@ -29,8 +30,7 @@ local function class(...) -- super list
     function cls.new(...)
         local sets = {}
         local gets = {}
-        local instance =
-        setmetatable(
+        local instance = setmetatable(
         {},
         {
             __index = function(t, k)
@@ -47,6 +47,9 @@ local function class(...) -- super list
             end
         }
         )
+        if instance.set or instance.get then
+            error("error : Prohibition of override 'set' and 'get' Function;");
+        end
         instance.set = function(this, name, func)
             instance[name] = nil
             sets[name] = func
