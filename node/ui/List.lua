@@ -20,18 +20,18 @@ function List.ctor(this)
     this._array = nil;
 
 
-    this:set("itemRender", function (v)
+    this:setter("itemRender", function (v)
         this._itemRender = v;
     end)
-    this:get("itemRender", function ()
+    this:getter("itemRender", function ()
         return this._itemRender;
     end)
 
 
-    this:set("array", function (v)
+    this:setter("array", function (v)
         this._array = v;
     end)
-    this:get("array", function ()
+    this:getter("array", function ()
         return this._array;
     end)
 

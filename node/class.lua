@@ -50,12 +50,12 @@ local function class(...)
         if instance.set or instance.get then
             error("error : Prohibition of override 'set' and 'get' Function;");
         end
-        instance.set = function(this, name, func)
+        instance.setter = function(this, name, func)
             instance[name] = nil
             sets[name] = func
             return instance
         end
-        instance.get = function(this, name, func)
+        instance.getter = function(this, name, func)
             gets[name] = func
             return instance
         end

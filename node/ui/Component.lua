@@ -27,23 +27,23 @@ function Component.ctor(this)
     this._anchorX = nil
     this._anchorY = nil
 
-    this:set("anchorX",function (v)
+    this:setter("anchorX",function (v)
         if v ~= this._anchorX then
             this._anchorX = v;
             this:_onResize();
         end
     end)
-    this:get("anchorX",function ()
+    this:getter("anchorX",function ()
         return this._anchorX or 0;
     end)
 
-    this:set("anchorY",function (v)
+    this:setter("anchorY",function (v)
         if this._anchorY ~= v then
             this._anchorY = v;
             this:_onResize();
         end
     end)
-    this:get("anchorY",function ()
+    this:getter("anchorY",function ()
         return this._anchorY or 0;
     end)
 
@@ -55,58 +55,58 @@ function Component.ctor(this)
     this.left = nil;
     this.right = nil;
 
-    this:set("top",function (v)
+    this:setter("top",function (v)
         this._top = v;
         this:_onResize()
     end)
-    this:get("top",function ()
+    this:getter("top",function ()
         return this._top;
     end)
 
     this._width = nil;
-    this:set("width",function (v)
+    this:setter("width",function (v)
         if v ~= this._width then
             this._width = v;
             this:_onResize()
         end
     end)
 
-    this:get("width",function ()
+    this:getter("width",function ()
         if this._width then return this._width end;
         return this.measureWidth
     end)
 
     this._height = nil;
-    this:set("height",function (v)
+    this:setter("height",function (v)
         if v ~= this._height then
             this._height = v;
             this:_onResize()
         end
     end)
 
-    this:get("height",function ()
+    this:getter("height",function ()
         if this._height then return this._height end;
         return this.measureHeight;
     end)
 
 
     this._scaleX = 1;
-    this:set("scaleX",function (v)
+    this:setter("scaleX",function (v)
         this._scaleX = v;
         this:_onResize()
     end)
 
-    this:get("scaleX",function ()
+    this:getter("scaleX",function ()
         return this._scaleX;
     end)
 
     this._scaleY = 1;
-    this:set("scaleY",function (v)
+    this:setter("scaleY",function (v)
         this._scaleY = v;
         this:_onResize()
     end)
 
-    this:get("scaleY",function ()
+    this:getter("scaleY",function ()
         return this._scaleY;
     end)
 
@@ -118,7 +118,7 @@ function Component.ctor(this)
     -- [[ 自动根据自身或者子组件来制定自身的范围 --]]
     this.autoSize = true;
 
-    this:get("measureWidth",function ()
+    this:getter("measureWidth",function ()
         local max = 0;
         for i=this:numChild(),1,-1 do
             ---@type Sprite
@@ -130,7 +130,7 @@ function Component.ctor(this)
         return max;
     end)
 
-    this:get("measureHeight",function ()
+    this:getter("measureHeight",function ()
         local max = 0;
         for i=this:numChild(),1,-1 do
             ---@type Sprite
@@ -143,10 +143,10 @@ function Component.ctor(this)
     end)
 
 
-    this:get("displayWidth",function ()
+    this:getter("displayWidth",function ()
         return this.width * this.scaleX;
     end)
-    this:get("displayHeight",function ()
+    this:getter("displayHeight",function ()
         return this.height * this.scaleY;
     end)
 

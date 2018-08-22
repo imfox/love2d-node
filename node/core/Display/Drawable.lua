@@ -23,60 +23,60 @@ function Drawable.ctor(this)
     Node.ctor(this)
     this.transform = love.math.newTransform();
 
-    this:set("x",function (v)
+    this:setter("x",function (v)
         this._x = v;
         this:_calcTransform()
     end)
-    this:get("x",function ()
+    this:getter("x",function ()
         return this._x or 0;
     end)
 
-    this:set("y",function (v)
+    this:setter("y",function (v)
         this._y = v;
         this:_calcTransform()
     end)
 
-    this:get("y",function ()
+    this:getter("y",function ()
         return this._y or 0;
     end)
 
-    this:set("scaleX",function (v)
+    this:setter("scaleX",function (v)
         this._scaleX = v or 1;
         this:_calcTransform()
     end)
-    this:get("scaleX",function ()
+    this:getter("scaleX",function ()
         return this._scaleX or 1;
     end)
 
-    this:set("scaleY",function (v)
+    this:setter("scaleY",function (v)
         this._scaleY = v or 1;
         this:_calcTransform()
     end)
-    this:get("scaleY",function ()
+    this:getter("scaleY",function ()
         return this._scaleY or 1;
     end)
 
-    this:set("pivotX",function (v)
+    this:setter("pivotX",function (v)
         this._pivotX = v;
         this:_calcTransform()
     end)
-    this:get("pivotX",function ()
+    this:getter("pivotX",function ()
         return this._pivotX or 1;
     end)
 
-    this:set("pivotY",function (v)
+    this:setter("pivotY",function (v)
         this._pivotY = v;
         this:_calcTransform()
     end)
-    this:get("pivotY",function ()
+    this:getter("pivotY",function ()
         return this._pivotY or 0;
     end)
 
-    this:set("rotation",function (v)
+    this:setter("rotation",function (v)
         this._rotation = v;
         this:_calcTransform()
     end)
-    this:get("rotation",function ()
+    this:getter("rotation",function ()
         return this._rotation or 0;
     end)
 
@@ -96,22 +96,22 @@ function Drawable.ctor(this)
     this.id =  Utils.getGID();
 
     this._width = nil
-    this:set("width", function (v)
+    this:setter("width", function (v)
         this._width = v;
         this.autoSize = false;
         this:_changeSize()
     end)
-    this:get("width", function ()
+    this:getter("width", function ()
         return this._width or 0;
     end)
 
     this._height = nil
-    this:set("height", function (v)
+    this:setter("height", function (v)
         this._height = v;
         this.autoSize = false;
         this:_changeSize()
     end)
-    this:get("height", function ()
+    this:getter("height", function ()
         return this._height or 0;
     end)
 

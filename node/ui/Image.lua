@@ -52,22 +52,22 @@ local Sprite = class(Component)
 function Sprite.ctor(this,skin)
     Component.ctor(this)
 
-    this:set("skin",function (v)
+    this:setter("skin",function (v)
         this._skin = v;
         Loader:load(this._skin,Loader.IMAGE,true,Utils.call(this._onLoad,this));
     end)
-    this:get("skin",function () return this._skin; end)
+    this:getter("skin",function () return this._skin; end)
 
     this._sizeGrid = nil
 
-    this:set("sizeGrid", function (v)
+    this:setter("sizeGrid", function (v)
         this._sizeGrid = v;
         this:_updateSkin();
     end)
-    this:get("sizeGrid",function () return this._sizeGrid; end )
+    this:getter("sizeGrid",function () return this._sizeGrid; end )
 
     this._width = 0
-    this:set("width", function (v)
+    this:setter("width", function (v)
         if this._width ~= v then
             this._width = v;
             this.autoSize = false;
@@ -75,7 +75,7 @@ function Sprite.ctor(this,skin)
             this:_changeSize()
         end
     end)
-    this:get("width", function ()
+    this:getter("width", function ()
         if this._width == nil  then
             if this._image then
                 return this._image:getWidth()
@@ -86,7 +86,7 @@ function Sprite.ctor(this,skin)
     end)
 
     this._height = 0
-    this:set("height", function (v)
+    this:setter("height", function (v)
         if this._height ~= v then
             this._height = v;
             this.autoSize = false;
@@ -94,7 +94,7 @@ function Sprite.ctor(this,skin)
             this:_changeSize()
         end
     end)
-    this:get("height", function ()
+    this:getter("height", function ()
         if this._height == nil  then
             if this._image then
                 return this._image:getHeight()

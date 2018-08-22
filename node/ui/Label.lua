@@ -32,13 +32,13 @@ function Label.ctor(this)
     this.color = "#fff";
     this._font = love.graphics.getFont()
     
-    this:set("font", function (v)
+    this:setter("font", function (v)
         local font = Font:getFont(v);
         if not font then return end
         this._font = font;
     end)
 
-    this:get("font", function ()
+    this:getter("font", function ()
         return this._font;
     end)
 end
