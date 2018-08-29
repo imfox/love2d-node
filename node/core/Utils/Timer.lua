@@ -63,6 +63,10 @@ function _timer.scale(this, n)
     return this;
 end
 
+function _timer:destroy()
+    self.destroyed = true;
+end
+
 ---@type _timer[]
 local timers = {}
 
