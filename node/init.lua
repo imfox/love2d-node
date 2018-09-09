@@ -25,6 +25,7 @@ local Ease = require("node.core.Utils.Ease");
 
 local View = require("node.ui.View");
 local Dialog = require("node.ui.Dialog");
+local Box = require("node.ui.Box");
 local Label = require("node.ui.Label");
 local Image = require("node.ui.Image");
 
@@ -77,41 +78,42 @@ end
 local function draw()
     love.graphics.push()
     love.graphics.translate(offsetX, offsetY)
-    love.graphics.scale(sclaeX,sclaeY)
+    love.graphics.scale(sclaeX, sclaeY)
     stage:draw()
     love.graphics.pop()
 
-    if offsetX ~= 0 or offsetY ~= 0 then  --隐藏其它...比较搓
-        local w,h = love.graphics.getWidth(),love.graphics.getHeight()
-        love.graphics.setColor(0,0,0,255)
-        love.graphics.rectangle("fill",0,0,offsetX,h)
-        love.graphics.rectangle("fill",0,0,w,offsetY)
-        love.graphics.rectangle("fill",w-offsetX,0,offsetX,h)
-        love.graphics.rectangle("fill",0,h-offsetY,w,offsetY)
-        love.graphics.setColor(255,255,255,255)
+    if offsetX ~= 0 or offsetY ~= 0 then
+        --隐藏其它...比较搓
+        local w, h = love.graphics.getWidth(), love.graphics.getHeight()
+        love.graphics.setColor(0, 0, 0, 255)
+        love.graphics.rectangle("fill", 0, 0, offsetX, h)
+        love.graphics.rectangle("fill", 0, 0, w, offsetY)
+        love.graphics.rectangle("fill", w - offsetX, 0, offsetX, h)
+        love.graphics.rectangle("fill", 0, h - offsetY, w, offsetY)
+        love.graphics.setColor(255, 255, 255, 255)
     end
 end
 
-local function mouseEvent(type,x,y)
-    local _x,_y = touchPoint(x,y)
-    stage:mouseEvent(type,_x,_y)
+local function mouseEvent(type, x, y)
+    local _x, _y = touchPoint(x, y)
+    stage:mouseEvent(type, _x, _y)
 end
 
-local function keyboardEvent(type,key)
-    stage:keyboardEvent(type,key)
+local function keyboardEvent(type, key)
+    stage:keyboardEvent(type, key)
 end
 
 local function wheelmoved( x, y )
 end
 
 local function touchmoved( id, x, y, dx, dy, pressure )
-    mouseEvent(UIEvent.MOUSE_MOVE,x,y)
+    mouseEvent(UIEvent.MOUSE_MOVE, x, y)
 end
 local function touchpressed( id, x, y, dx, dy, pressure )
-    mouseEvent(UIEvent.MOUSE_DOWN,x,y)
+    mouseEvent(UIEvent.MOUSE_DOWN, x, y)
 end
 local function touchreleased( id, x, y, dx, dy, pressure )
-    mouseEvent(UIEvent.MOUSE_UP,x,y)
+    mouseEvent(UIEvent.MOUSE_UP, x, y)
 end
 
 local function mousereleased(x, y, button, istouch)
@@ -119,24 +121,24 @@ local function mousereleased(x, y, button, istouch)
     if button == 2 then
         type = UIEvent.RMOUSE_UP
     end
-    mouseEvent(type,x,y)
+    mouseEvent(type, x, y)
 end
 local function mousepressed(x, y, button, istouch)
     local type = UIEvent.MOUSE_DOWN;
     if button == 2 then
         type = UIEvent.RMOUSE_DOWN
     end
-    mouseEvent(type,x,y)
+    mouseEvent(type, x, y)
 end
 local function mousemoved( x, y, dx, dy, istouch)
-    mouseEvent(UIEvent.MOUSE_MOVE,x,y)
+    mouseEvent(UIEvent.MOUSE_MOVE, x, y)
 end
 
 local function keypressed(key, scancode, isrepeat)
-    keyboardEvent(UIEvent.KEY_DOWN,key)
+    keyboardEvent(UIEvent.KEY_DOWN, key)
 end
 local function keyreleased(key, scancode)
-    keyboardEvent(UIEvent.KEY_UP,key)
+    keyboardEvent(UIEvent.KEY_UP, key)
 end
 
 local function focus(b)
@@ -158,7 +160,7 @@ local export = {
 
     View = View,
     Dialog = Dialog,
-
+    Box = Box,
     Label = Label,
     Image = Image,
 
@@ -187,23 +189,23 @@ local export = {
 
 }
 
-local function init(self,title,width,height)
+local function init(self, title, width, height)
     love.window.setTitle(title);
     stage.width = width;
     stage.height = height;
-    resize(love.graphics.getWidth(),love.graphics.getHeight())
+    resize(love.graphics.getWidth(), love.graphics.getHeight())
     return export;
 end
 
-setmetatable(export,{__call=init})
+setmetatable(export, { __call = init })
 
 local function register(self)
-    local funcs = {"load","update","draw","focus","resize","keypressed","keyreleased","wheelmoved"};
+    local funcs = { "load", "update", "draw", "focus", "resize", "keypressed", "keyreleased", "wheelmoved" };
 
-    local touchFuncs = {"mousemoved","mousepressed","mousereleased"}
+    local touchFuncs = { "mousemoved", "mousepressed", "mousereleased" }
     local system = love.system.getOS();
     if system == "Android" or system == "iOS" then
-        touchFuncs = {"touchmoved","touchreleased","touchpressed"};
+        touchFuncs = { "touchmoved", "touchreleased", "touchpressed" };
     end
 
     for _, name in pairs(touchFuncs) do

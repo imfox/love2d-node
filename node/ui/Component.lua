@@ -227,4 +227,12 @@ end
 function Component.initialize(this,...)
 end
 
+---@param x number
+---@param y number
+---@return Component
+function Component:anchor(x,y)
+    self.anchorX = x;
+    self.anchorY = y;
+    return Component;
+end
 return Component;

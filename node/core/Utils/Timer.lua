@@ -30,24 +30,25 @@ function _timer.ctor(this, type, delay, count, caller, func, params)
     this.destroyed = false;
 end
 
----@param this _timer
 ---@param dt number
+---@param this _timer
 ---@return boolean
 function _timer.update(this, dt)
     if (this.count == 0 or this.destroyed) then
         return
     end
     local delay = 1
-    delay = (this.type == "frame" and 1 or dt) * this.m_scale * globalScale;
+    delay = ((this.type == "frame") and 1 or dt) * this.m_scale * globalScale;
     this.time = this.time + delay
-    if (this.time > this.delay) then
+    if (this.time >= this.delay) then
         this.time = this.time - this.delay
         this.count = this.count - 1
+        local params = this.params or {};
         if (type(this.func) == "function") then
             if this.caller then
-                this.func(this.caller, this.params ~= nil and unpack(this.params) or nil)
+                this.func(this.caller, unpack(params))
             else
-                this.func(this.params ~= nil and unpack(this.params) or nil)
+                this.func(unpack(params))
             end
             return this.count == 0
         end
@@ -84,9 +85,9 @@ function Timer:_updateAll(dt)
                 table.remove(timers, i)
             end
         end
-        for i = 1, #timers do
-            if (timers[i]:update(dt)) then
-                timers[i].destroyed = true;
+        for _, timer in ipairs(timers) do
+            if timer:update(dt) then
+                timer:destroy()
             end
         end
     end
@@ -136,20 +137,12 @@ end
 ---@param func Function
 ---@param arg table
 function Timer:callLater(caller, func, arg)
-    ---@type _timer
-    local timer;
-    for i = #timers, 1, -1 do
-        -- 会在render之前调用 并且只会调用一次
-        if (timers[i].type == "later" and not timers[i].destroyed and timers[i].caller == caller and timers[i].func == func) then
-            timer = timers[i];
-            timer.func = func
-            timer.arg = arg;
+    for _, timer in ipairs(timers) do
+        if (timer.type == "later" and timer.caller == caller and timer.func == func) then
+            timer:destroy();
         end
     end
-    if not timer then
-        timer = pushTimer("later", 0, 1, caller, func, arg)
-    end
-    return
+    return pushTimer("later", 0, 1, caller, func, arg);
 end
 
 ---@return Timer
