@@ -8,6 +8,8 @@ local Constant = require("node.core.Utils.Constant")
 ---@type Drawable
 local Drawable = require("node.core.Display.Drawable")
 
+local setShader = love.graphics.setShader
+
 ---@class Component : Drawable
 ---@field anchorX number
 ---@field anchorY number
