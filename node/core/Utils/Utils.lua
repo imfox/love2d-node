@@ -35,8 +35,8 @@ function Utils.tablePrint(root)
     end
 end
 
-function Utils.tableClone(object)
-    local lookup_table = {}
+function Utils.tableClone(object,base)
+    local lookup_table = base or {}
     --新建table用于记录
     local function _copy(object) --_copy(object)函数用于实现复制
         if type(object) ~= "table" then
@@ -113,14 +113,14 @@ end
 ---@param ... any[]
 function Utils.call(func,caller,...)
     local args = {...}
-    if caller then 
+    if caller then
         return function ()
             return func(caller,unpack(args))
         end
     end
     return function ()
         return func(unpack(args))
-    end 
+    end
 end
 
 
@@ -129,13 +129,13 @@ function Utils.stripFilename(filename)
 	return string.match(filename, "(.+)/[^/]*%.%w+$") --*nix system
 	--return string.match(filename, “(.+)\\[^\\]*%.%w+$”) — windows
 end
- 
+
 --获取文件名
 function Utils.stripPath(filename)
 	return string.match(filename, ".+/([^/]*%.%w+)$") -- *nix system
 	--return string.match(filename, “.+\\([^\\]*%.%w+)$”) — *nix system
 end
- 
+
 --去除扩展名
 function Utils.stripExtension(filename)
 	local idx = filename:match(".+()%.%w+$")
@@ -145,7 +145,7 @@ function Utils.stripExtension(filename)
 		return filename
 	end
 end
- 
+
 --获取扩展名
 function Utils.getExtension(filename)
 	return filename:match(".+%.(%w+)$")
