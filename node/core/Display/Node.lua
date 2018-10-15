@@ -15,6 +15,7 @@ local Node =  class(Message);
 function Node:ctor()
     Message.ctor(self)
     self.name = "";
+    ---@type Node[]
     self.components = {};
     self.parent = nil;
     self.destroyed = false;
