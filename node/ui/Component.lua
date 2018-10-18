@@ -17,6 +17,7 @@ local setShader = love.graphics.setShader
 ---@field measureHeight number
 ---@field displayWidth number
 ---@field displayHeight number
+---@field dataSource table
 local Component = class(Drawable);
 
 ---@param this Component
@@ -116,6 +117,7 @@ function Component.ctor(this)
     this.tag = nil;
     this.gray = false;
     this.disabled = false;
+    this.dataSource = nil;
 
     -- [[ 自动根据自身或者子组件来制定自身的范围 --]]
     this.autoSize = true;

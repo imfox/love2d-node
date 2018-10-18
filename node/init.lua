@@ -12,6 +12,8 @@ class = require("node.class");
 import = require("node.import");
 
 
+local MouseManager = require("node.core.Event.MouseManager");
+
 local Node = require("node.core.Display.Node");
 local Drawable = require("node.core.Display.Drawable");
 
@@ -36,6 +38,9 @@ local Stat = require("node.core.Utils.Stat");
 
 ---@type node2d_utils_font
 local Font = require("node.core.utils.Font")
+
+MouseManager:set(stage);
+
 
 local sclaeX, sclaeY = 1, 1
 local offsetX, offsetY = 0, 0
@@ -75,28 +80,33 @@ local function update(dt)
     Tween._update(dt);
 end
 
+
+local gr = love.graphics
 local function draw()
-    love.graphics.push()
-    love.graphics.translate(offsetX, offsetY)
-    love.graphics.scale(sclaeX, sclaeY)
-    stage:draw()
-    love.graphics.pop()
+
+    stage:_renderRenderLine(gr)
+
+    gr.push()
+    gr.translate(offsetX, offsetY)
+    gr.scale(sclaeX, sclaeY)
+    stage:draw(gr)
+    gr.pop()
 
     if offsetX ~= 0 or offsetY ~= 0 then
         --隐藏其它...比较搓
-        local w, h = love.graphics.getWidth(), love.graphics.getHeight()
-        love.graphics.setColor(0, 0, 0, 255)
-        love.graphics.rectangle("fill", 0, 0, offsetX, h)
-        love.graphics.rectangle("fill", 0, 0, w, offsetY)
-        love.graphics.rectangle("fill", w - offsetX, 0, offsetX, h)
-        love.graphics.rectangle("fill", 0, h - offsetY, w, offsetY)
-        love.graphics.setColor(255, 255, 255, 255)
+        local w, h = gr.getWidth(), gr.getHeight()
+        gr.setColor(0, 0, 0, 255)
+        gr.rectangle("fill", 0, 0, offsetX, h)
+        gr.rectangle("fill", 0, 0, w, offsetY)
+        gr.rectangle("fill", w - offsetX, 0, offsetX, h)
+        gr.rectangle("fill", 0, h - offsetY, w, offsetY)
+        gr.setColor(255, 255, 255, 255)
     end
 end
 
 local function mouseEvent(type, x, y)
     local _x, _y = touchPoint(x, y)
-    stage:mouseEvent(type, _x, _y)
+    MouseManager:onMouseEvent(type, _x, _y);
 end
 
 local function keyboardEvent(type, key)

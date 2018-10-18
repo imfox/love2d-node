@@ -49,25 +49,29 @@ local Sprite = class(Component)
 
 ---@param this Sprite
 ---@param skin string
-function Sprite.ctor(this,skin)
+function Sprite.ctor(this, skin)
     Component.ctor(this)
 
-    this:setter("skin",function (v)
+    this:setter("skin", function(v)
         this._skin = v;
-        Loader:load(this._skin,Loader.IMAGE,true,Utils.call(this._onLoad,this));
+        Loader:load(this._skin, Loader.IMAGE, true, Utils.call(this._onLoad, this));
     end)
-    this:getter("skin",function () return this._skin; end)
+    this:getter("skin", function()
+        return this._skin;
+    end)
 
     this._sizeGrid = nil
 
-    this:setter("sizeGrid", function (v)
+    this:setter("sizeGrid", function(v)
         this._sizeGrid = v;
         this:_updateSkin();
     end)
-    this:getter("sizeGrid",function () return this._sizeGrid; end )
+    this:getter("sizeGrid", function()
+        return this._sizeGrid;
+    end )
 
     this._width = 0
-    this:setter("width", function (v)
+    this:setter("width", function(v)
         if this._width ~= v then
             this._width = v;
             this.autoSize = false;
@@ -75,8 +79,8 @@ function Sprite.ctor(this,skin)
             this:_changeSize()
         end
     end)
-    this:getter("width", function ()
-        if this._width == nil  then
+    this:getter("width", function()
+        if this._width == nil then
             if this._image then
                 return this._image:getWidth()
             end
@@ -86,7 +90,7 @@ function Sprite.ctor(this,skin)
     end)
 
     this._height = 0
-    this:setter("height", function (v)
+    this:setter("height", function(v)
         if this._height ~= v then
             this._height = v;
             this.autoSize = false;
@@ -94,8 +98,8 @@ function Sprite.ctor(this,skin)
             this:_changeSize()
         end
     end)
-    this:getter("height", function ()
-        if this._height == nil  then
+    this:getter("height", function()
+        if this._height == nil then
             if this._image then
                 return this._image:getHeight()
             end
@@ -105,15 +109,34 @@ function Sprite.ctor(this,skin)
     end)
 
 
+    ---@protected
+    this._dataSource = nil;
+    this:setter("dataSource", function(d)
+        if d then
+            if type(d) == "string" then
+                this.skin = d;
+            else
+                for k, v in pairs(d) do
+                    this[k] = v;
+                end
+            end
+        end
+        this._dataSource = d;
+    end)
+
+    this:getter("dataSource", function()
+        return this._dataSource;
+    end)
+
     this.skin = skin;
 
     this._drawMode = nil;
-    
+
 end
 
 ---@protected
 function Sprite:_onLoad()
-    if self._skin then 
+    if self._skin then
         self._image = Loader:getRes(self._skin);
         self:_onResize();
     end
@@ -127,7 +150,7 @@ end
 ---@param this Sprite
 function Sprite._updateSkin(this)
     if this._skin and this._sizeGrid then
-        local grids =  Utils.splteText(this._sizeGrid,",");
+        local grids = Utils.splteText(this._sizeGrid, ",");
         if #grids >= 5 and grids[5] == "1" then
             this._drawMode = 1;
         end
@@ -135,25 +158,25 @@ function Sprite._updateSkin(this)
     end
 end
 
-local function _fill(draw,img,quad,x,y,width,height)
+local function _fill(draw, img, quad, x, y, width, height)
     local bx = x;
     local by = y;
-    local qx,qy,qw,qh = quad:getViewport();
+    local qx, qy, qw, qh = quad:getViewport();
     local bh = height
     while bh > 0 do
         local bw = width
         if bh < qh then
-            quad:setViewport(qx,qy,bw,bh)
+            quad:setViewport(qx, qy, bw, bh)
         end
         while bw > 0 do
-            if bw < qw then 
-                quad:setViewport(qx,qy,bw,qh)
+            if bw < qw then
+                quad:setViewport(qx, qy, bw, qh)
             end
-            draw(img,quad,bx+width-bw,by+height-bh,0,1,1);
+            draw(img, quad, bx + width - bw, by + height - bh, 0, 1, 1);
             bw = bw - qw;
         end
         bh = bh - qh;
-        quad:setViewport(qx,qy,qw,qh)
+        quad:setViewport(qx, qy, qw, qh)
     end
 end
 
@@ -168,34 +191,34 @@ function Sprite:_draw(graphics)
         if self._sizeGrid == nil then
             local sx = self.width / width;
             local sy = self.height / height;
-            graphics.draw(img,0,0,0,sx,sy,self.pivotX/sx,self.pivotY/sy)
+            graphics.draw(img, 0, 0, 0, sx, sy, self.pivotX / sx, self.pivotY / sy)
         else
             local gridCenterWidth = width - self._grid[1] - self._grid[3]
             local gridCenterHeight = height - self._grid[2] - self._grid[4]
 
-            local scaleXGroup = {1, (self.width - self._grid[1] - self._grid[3]) / gridCenterWidth, 1}
-            local scaleYGroup = {1, (self.height - self._grid[2] - self._grid[4]) / gridCenterHeight, 1}
-            local xGroup = {0, self._grid[1], self.width - self._grid[3]}
-            local yGroup = {self.height - self._grid[4], self._grid[2], 0}
+            local scaleXGroup = { 1, (self.width - self._grid[1] - self._grid[3]) / gridCenterWidth, 1 }
+            local scaleYGroup = { 1, (self.height - self._grid[2] - self._grid[4]) / gridCenterHeight, 1 }
+            local xGroup = { 0, self._grid[1], self.width - self._grid[3] }
+            local yGroup = { self.height - self._grid[4], self._grid[2], 0 }
 
-            local dw,dh;
-            if self._drawMode == 1 then 
-                dw = {self._grid[1],gridCenterWidth,self._grid[3]};
-                dh = {self._grid[4],gridCenterHeight, self._grid[2]};
+            local dw, dh;
+            if self._drawMode == 1 then
+                dw = { self._grid[1], gridCenterWidth, self._grid[3] };
+                dh = { self._grid[4], gridCenterHeight, self._grid[2] };
             end
 
-            local j,quad;
+            local j, quad;
             for i = 1, 3 do
                 for n = 1, 3 do
-                    j = (i-1) * 3 + n
+                    j = (i - 1) * 3 + n
                     quad = self._grid_quad[j];
                     if (quad) then
                         local bx = (-(self.pivotX * self.scaleX) + (xGroup[n] * self.scaleX));
                         local by = (-(self.pivotY * self.scaleY) + (yGroup[i] * self.scaleY));
                         if self._drawMode == 1 then
-                            _fill(graphics.draw,img,quad,bx,by,self.scaleX*scaleXGroup[n]*dw[n],self.scaleY*scaleYGroup[i]*dh[i])
+                            _fill(graphics.draw, img, quad, bx, by, self.scaleX * scaleXGroup[n] * dw[n], self.scaleY * scaleYGroup[i] * dh[i])
                         else
-                            graphics.draw(img,quad,bx,by,0,self.scaleX*scaleXGroup[n],self.scaleY*scaleYGroup[i])
+                            graphics.draw(img, quad, bx, by, 0, self.scaleX * scaleXGroup[n], self.scaleY * scaleYGroup[i])
                         end
                     end
                 end
@@ -213,7 +236,7 @@ end
 ---@param bottom number
 ---@return Sprite
 ---@protected
-function Sprite.__setGrid(this , top, right, bottom, left)
+function Sprite.__setGrid(this, top, right, bottom, left)
     if this._image == nil then
         return this;
     end

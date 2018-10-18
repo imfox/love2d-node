@@ -2,6 +2,9 @@
 --- Created by fox.
 --- DateTime: 2018/3/29 20:54
 ---
+
+
+---@class node2d_core_event_uievent : Klass
 local UIEvent = {}
 
 UIEvent.MOUSE_DOWN = "MOUSE_DOWN"

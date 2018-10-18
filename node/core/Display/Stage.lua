@@ -24,37 +24,6 @@ local UIEvent = require("node.core.Event.UIEvent");
 --
 --end
 
----@param draw Drawable
----@param x number
----@param y number
----@return Drawable
-local function HitObject(draw,x,y)
-    if not draw.visible or draw.destroyed then
-        return false
-    end
-
-    local nx,ny = x-draw.x,y-draw.y
-    local tx,ty = Math.rotatePointByZero(nx,ny,-draw.rotation)
-
-    local hit = false
-    if(Utils.pointHitRect(tx,ty,-draw.pivotX*draw.scaleX,-draw.pivotY*draw.scaleY,draw.width*draw.scaleX,draw.height*draw.scaleY))then
-        hit = draw
-        for i = draw:numChild(),1,-1 do
-            ---@type Drawable
-            local child = draw:getChildAt(i);
-            if child.visible and not child.destroyed and child.mouseEnabled then
-                local h = HitObject(child,(tx+draw.pivotX*draw.scaleX)*(1/draw.scaleX),(ty+draw.pivotY*draw.scaleY)*(1/draw.scaleY))
-                if h then
-                    hit = h
-                    break
-                end
-            end
-        end
-    end
-    return hit
-end
-
-
 ---@type stage
 local Stage
 
@@ -66,50 +35,20 @@ function stage.ctor(this)
     Drawable.ctor(this)
     this.name = "Stage"
 
-    ---@type Node
-    this.pressNode = nil
     this.mouseEnabled = true;
 
-    this.mouseX = 0;
-    this.mouseY = 0;
 end
 
 ---@param this stage
 ---@param type string
----@param x number
----@param y number
-function stage.mouseEvent(this,type,x,y)
-    this.mouseX,this.mouseY = x,y;
-    local hit = HitObject(this,x,y)
-    if hit and hit ~= Stage and hit.mouseEnabled then
-        if type == UIEvent.MOUSE_DOWN then
-            this.pressNode = hit;
-        elseif type == UIEvent.MOUSE_UP then
-            if this.pressNode == hit then
-                hit:event(UIEvent.CLICK)
-                this.pressNode = nil
-            end
-        elseif type == UIEvent.MOUSE_MOVE then
-        end
-        hit:event(type)
-    end
-    if this.pressNode and type == UIEvent.MOUSE_UP then
-        this.pressNode:event(UIEvent.MOUSE_LEAVE_UP)
-        this.pressNode = nil
-    end
+function stage.keyboardEvent(this, type, key)
+    this:event(type, { key })
     return this
 end
 
 ---@param this stage
----@param type string
-function stage.keyboardEvent(this,type,key)
-    this:event(type,{key})
-    return this
-end
-
----@param this stage
-function stage.draw(this)
-    this:_render(love.graphics)
+function stage.draw(this, graphics)
+    this:_render(graphics)
 end
 
 Stage = stage.new();

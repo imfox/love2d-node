@@ -13,32 +13,33 @@ function Utils.tablePrint(root)
         local pairs = pairs
         local tostring = tostring
         local next = next
-        local cache = {  [root] = "." }
-        local function _dump(t,space,name)
+        local cache = { [root] = "." }
+        local function _dump(t, space, name)
             local temp = {}
-            for k,v in pairs(t) do
+            for k, v in pairs(t) do
                 local key = tostring(k)
                 if cache[v] then
-                    tinsert(temp,"." .. key .. " {" .. cache[v].."}")
+                    tinsert(temp, "." .. key .. " {" .. cache[v] .. "}")
                 elseif type(v) == "table" then
                     local new_key = name .. "." .. key
                     cache[v] = new_key
-                    tinsert(temp,"." .. key .. _dump(v,space .. (next(t,k) and "|" or " " ).. srep(" ",#key),new_key))
+                    tinsert(temp, "." .. key .. _dump(v, space .. (next(t, k) and "|" or " " ) .. srep(" ", #key), new_key))
                 else
-                    tinsert(temp,"." .. key .. " [" .. tostring(v).."]")
+                    tinsert(temp, "." .. key .. " [" .. tostring(v) .. "]")
                 end
             end
-            return tconcat(temp,"\n"..space)
+            return tconcat(temp, "\n" .. space)
         end
-        print(_dump(root, "",""))
+        print(_dump(root, "", ""))
         print('-------------------------------------')
     end
 end
 
-function Utils.tableClone(object,base)
+function Utils.tableClone(object, base)
     local lookup_table = base or {}
     --新建table用于记录
-    local function _copy(object) --_copy(object)函数用于实现复制
+    local function _copy(object)
+        --_copy(object)函数用于实现复制
         if type(object) ~= "table" then
             return object ---如果内容不是table 直接返回object(例如如果是数字\字符串直接返回该数字\该字符串)
         elseif lookup_table[object] then
@@ -61,13 +62,13 @@ end
 
 --分割文本(文本,分割符)
 function Utils.splteText(str, mark)
-    if str  then
+    if str then
         local result = {}
-        str = str..mark
+        str = str .. mark
         if mark == "(" or mark == ")" or mark == "." or mark == "%" or mark == "+" or mark == "-" or mark == "*" or mark == "?" or mark == "[" or mark == "^" or mark == "$" then
-            mark = "(.-)".."%"..mark
+            mark = "(.-)" .. "%" .. mark
         else
-            mark = "(.-)"..mark
+            mark = "(.-)" .. mark
         end
         for match in str:gmatch(mark) do
             table.insert(result, match)
@@ -91,12 +92,12 @@ function Utils.pointHitQuad(x, y, lt--[[ {x,y} --]], lb--[[ {x,y} --]], rt--[[ {
     return false;
 end
 
-function Utils.pointHitRect(x1,y1,x0,y0,w0,h0)
-    return x1 >= x0 and x1 <= x0 + w0 and y1>=y0 and y1 < y0 + h0
+function Utils.pointHitRect(x1, y1, x0, y0, w0, h0)
+    return x1 >= x0 and x1 <= x0 + w0 and y1 >= y0 and y1 < y0 + h0
 end
 
-function Utils.newPoint(x,y)
-    return {x=x,y=y};
+function Utils.newPoint(x, y)
+    return { x = x, y = y };
 end
 
 
@@ -111,14 +112,14 @@ end
 ---@param func fun()
 ---@param caller any
 ---@param ... any[]
-function Utils.call(func,caller,...)
-    local args = {...}
+function Utils.call(func, caller, ...)
+    local args = { ... }
     if caller then
-        return function ()
-            return func(caller,unpack(args))
+        return function()
+            return func(caller, unpack(args))
         end
     end
-    return function ()
+    return function()
         return func(unpack(args))
     end
 end
@@ -126,29 +127,77 @@ end
 
 --获取路径
 function Utils.stripFilename(filename)
-	return string.match(filename, "(.+)/[^/]*%.%w+$") --*nix system
-	--return string.match(filename, “(.+)\\[^\\]*%.%w+$”) — windows
+    return string.match(filename, "(.+)/[^/]*%.%w+$") --*nix system
+    --return string.match(filename, “(.+)\\[^\\]*%.%w+$”) — windows
 end
 
 --获取文件名
 function Utils.stripPath(filename)
-	return string.match(filename, ".+/([^/]*%.%w+)$") -- *nix system
-	--return string.match(filename, “.+\\([^\\]*%.%w+)$”) — *nix system
+    return string.match(filename, ".+/([^/]*%.%w+)$") -- *nix system
+    --return string.match(filename, “.+\\([^\\]*%.%w+)$”) — *nix system
 end
 
 --去除扩展名
 function Utils.stripExtension(filename)
-	local idx = filename:match(".+()%.%w+$")
-	if(idx) then
-		return filename:sub(1, idx-1)
-	else
-		return filename
-	end
+    local idx = filename:match(".+()%.%w+$")
+    if (idx) then
+        return filename:sub(1, idx - 1)
+    else
+        return filename
+    end
 end
 
 --获取扩展名
 function Utils.getExtension(filename)
-	return filename:match(".+%.(%w+)$")
+    return filename:match(".+%.(%w+)$")
+end
+
+
+---@param color string
+---@return number,number,number,number
+function Utils.htmlColor2RGBA(color)
+    local str
+    local len = 2
+    if string.len(color) == 7 then
+        str = string.sub(color, 2, 8)
+    elseif string.len(color) == 4 then
+        len = 1;
+        str = string.sub(color, 2, 5)
+    else
+        str = "ffffff";
+    end
+
+    local rgba = {}
+    for i = 1, #str, len do
+        local x = tonumber(string.sub(str, i, i + len - 1), 16);
+        if len == 1 then
+            x = x / 0xf;
+        else
+            x = x / 0xff;
+        end
+        table.insert(rgba, x)
+    end
+
+    if #rgba <= 3 then
+        table.insert(rgba, 1)
+    end
+
+    return rgba;
+end
+
+---@param any[]
+---@param any
+---@return number
+function Utils.tableIndexOf(arr, value)
+    for i, v in ipairs(arr) do
+        if v == value then
+            return i;
+        end
+    end
+    return 0;
+end
+
+function Utils.void()
 end
 
 return Utils;

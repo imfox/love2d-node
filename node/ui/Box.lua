@@ -14,8 +14,32 @@ local Box = class(Component);
 ---@param this Box
 function Box.ctor(this)
     Component.ctor(this)
-    --@type table
-    this.dataSource = nil;
+
+    ---@type table
+    this._dataSource = nil;
+
+    this:setter("dataSource", function(d)
+        if d ~= nil then
+            if type(d) == "string" then
+                this.name = d;
+            else
+                for k, v in pairs(d) do
+                    ---@type Component
+                    local child = this:getChildByName(k);
+                    if child then
+                        child.dataSource = v;
+                    else
+                        this[k] = v;
+                    end
+                end
+            end
+        end
+        this._dataSource = d;
+    end)
+
+    this:getter("dataSource", function(v)
+        return self._dataSource;
+    end)
 end
 
 return Box;

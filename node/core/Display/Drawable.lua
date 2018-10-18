@@ -17,6 +17,8 @@ local translate,pop,push = love.graphics.translate,love.graphics.pop,love.graphi
 
 ---@class Drawable : Node
 local Drawable = class(Node);
+---@type Drawable[]
+Drawable.renderLine = {};
 
 ---@param this Drawable
 function Drawable.ctor(this)
@@ -94,6 +96,11 @@ function Drawable.ctor(this)
     this.rotation = 0;
     this.visible = true;
     this.id =  Utils.getGID();
+
+    ---@protected
+    this._canvas = nil;
+    ---@protected
+    this.renderArea = nil;
 
     this._width = nil
     this:setter("width", function (v)
@@ -207,6 +214,45 @@ function Drawable.size(this,w,h)
     return this;
 end
 
+---@protected
+function Drawable:_addToRenderLine()
+    self.renderArea = true;
+    for _, dw in ipairs(Drawable.renderLine) do
+        if dw == self then
+            break;
+        end
+    end
+    table.insert(Drawable.renderLine, self);
+end
+
+---@protected
+function Drawable:_removeForRenderLide()
+    self.renderArea = false;
+    for i = #Drawable.renderLine, 1, -1 do
+        if Drawable.renderLine[i] == self then
+            table.remove(Drawable.renderLine, i);
+        end
+    end
+end
+
+---@protected
+---@param graphics graphics
+function Drawable:_renderRenderLine(graphics)
+    for _, dw in ipairs(Drawable.renderLine) do
+        graphics.setCanvas(dw._canvas)
+        graphics.clear()
+        dw:_render(graphics)
+    end
+    graphics.setCanvas()
+end
+
+---@protected
+---@param graphics graphics
+function Drawable:_render2(graphics)
+    if self._canvas then
+        graphics.draw(self._canvas, 0, 0);
+    end
+end
 
 ---@param this Drawable
 ---@param x number
@@ -258,13 +304,16 @@ end
 function Drawable._renderChildren(this,graphics)
     translate(-this.pivotX,-this.pivotY);
     for _,drawable in ipairs(this.components) do
-        if drawable._render then 
+        if drawable.renderArea then
+            drawable:_render2(graphics)
+        elseif drawable._render then
             drawable:_render(graphics)
         end
     end
 end
 
 ---@protected
+---@return number,number,number,number
 function Drawable._push(this)
     local r,g,b,a = love.graphics.getColor()
     love.graphics.setColor(r,g,b,this.alpha * a)
