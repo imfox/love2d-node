@@ -87,12 +87,12 @@ end
 function c:check(node, x, y, callback)
     local nx, ny = x - node.x, y - node.y
 
-    if node.rotation ~= 0 or node.rotation % 360 ~= 0 then
+    if node.rotation ~= 0 and node.rotation % 360 ~= 0 then
         nx, ny = Math.rotatePointByZero(nx, ny, -node.rotation)
     end
 
     if not self.disableMouseEvent then
-        node.mouseX, node.mouseY = nx, nx;
+        node.mouseX, node.mouseY = nx, ny;
         if not hitTest(node, nx, ny) then
             return false;
         end
@@ -137,7 +137,7 @@ end
 ---@private
 ---@param node Drawable
 function c:onMouseMove(node)
-    node:event(UIEvent.MOUSE_MOVE);
+    tcMgr:mouseMove(node);
 end
 
 

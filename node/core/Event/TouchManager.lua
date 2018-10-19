@@ -29,7 +29,7 @@ end
 function c:mouseUp(node)
     local list = self:getNodes(node);
     self:sendEvents(list, UIEvent.MOUSE_UP);
-    if Utils.tableIndexOf(self.press, node) then
+    if Utils.tableIndexOf(self.press, node) > 0 then
         self:sendEvents(list, UIEvent.CLICK);
     end
 end
