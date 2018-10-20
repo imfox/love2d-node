@@ -5,10 +5,6 @@
 local class = require("node.class")
 
 local Drawable = require("node.core.Display.Drawable");
-local Utils = require("node.core.Utils.Utils");
-local Math = require("node.core.Math.Math");
-local UIEvent = require("node.core.Event.UIEvent");
-
 
 ---@param this Drawable
 --local function drawRect(this,x,y,r,w,h,mouseX,mouseY) --这个方法是用来渲染出组件的包围盒的
@@ -34,9 +30,8 @@ local stage = class(Drawable);
 function stage.ctor(this)
     Drawable.ctor(this)
     this.name = "Stage"
-
     this.mouseEnabled = true;
-
+    this.id = 1;
 end
 
 ---@param this stage

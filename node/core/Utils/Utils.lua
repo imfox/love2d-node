@@ -101,7 +101,7 @@ function Utils.newPoint(x, y)
 end
 
 
-local gid = 0;
+local gid = 1;
 -- 得到一个具有唯一性的ID
 function Utils.getGID()
     gid = gid + 1;
@@ -114,16 +114,17 @@ end
 ---@param ... any[]
 function Utils.call(func, caller, ...)
     local args = { ... }
-    if caller then
-        return function()
-            return func(caller, unpack(args))
+    return function(...)
+        local params = { ... };
+        for i, v in ipairs(args) do
+            table.insert(params, i, v);
         end
-    end
-    return function()
-        return func(unpack(args))
+        if caller then
+            return func(caller, unpack(params))
+        end
+        return func(unpack(params))
     end
 end
-
 
 --获取路径
 function Utils.stripFilename(filename)
