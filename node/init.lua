@@ -76,6 +76,7 @@ local function load( )
 end
 
 local function update(dt)
+    MouseManager:runEvent();
     Timer:_updateAll(dt);
     Tween._update(dt);
 end
@@ -104,9 +105,9 @@ local function draw()
     end
 end
 
-local function mouseEvent(type, x, y)
+local function mouseEvent(type, id, x, y)
     local _x, _y = touchPoint(x, y)
-    MouseManager:onMouseEvent(type, _x, _y);
+    MouseManager:onMouseEvent(type, id, _x, _y);
 end
 
 local function keyboardEvent(type, key)
@@ -117,13 +118,13 @@ local function wheelmoved( x, y )
 end
 
 local function touchmoved( id, x, y, dx, dy, pressure )
-    mouseEvent(UIEvent.MOUSE_MOVE, x, y)
+    mouseEvent(UIEvent.MOUSE_MOVE, id, x, y)
 end
 local function touchpressed( id, x, y, dx, dy, pressure )
-    mouseEvent(UIEvent.MOUSE_DOWN, x, y)
+    mouseEvent(UIEvent.MOUSE_DOWN, id, x, y)
 end
 local function touchreleased( id, x, y, dx, dy, pressure )
-    mouseEvent(UIEvent.MOUSE_UP, x, y)
+    mouseEvent(UIEvent.MOUSE_UP, id, x, y)
 end
 
 local function mousereleased(x, y, button, istouch)
@@ -131,17 +132,17 @@ local function mousereleased(x, y, button, istouch)
     if button == 2 then
         type = UIEvent.RMOUSE_UP
     end
-    mouseEvent(type, x, y)
+    mouseEvent(type, 1, x, y)
 end
 local function mousepressed(x, y, button, istouch)
     local type = UIEvent.MOUSE_DOWN;
     if button == 2 then
         type = UIEvent.RMOUSE_DOWN
     end
-    mouseEvent(type, x, y)
+    mouseEvent(type, 1, x, y)
 end
 local function mousemoved( x, y, dx, dy, istouch)
-    mouseEvent(UIEvent.MOUSE_MOVE, x, y)
+    mouseEvent(UIEvent.MOUSE_MOVE, 1, x, y)
 end
 
 local function keypressed(key, scancode, isrepeat)

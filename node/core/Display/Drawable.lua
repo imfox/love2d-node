@@ -140,7 +140,7 @@ function Drawable.ctor(this)
 end
 
 ---@param node Drawable
-function _mouseEnable(node)
+local function _mouseEnable(node)
     local parent = node
     while parent do
         -- 开启全部父节点可以点击

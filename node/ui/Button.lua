@@ -83,6 +83,7 @@ function c:ctor()
     self:on(UIEvent.MOUSE_DOWN, Utils.call(self.onMouseDown, self));
     self:on(UIEvent.MOUSE_UP, Utils.call(self.onMouseUp, self));
     self:on(UIEvent.MOUSE_OVER, Utils.call(self.onMouseUp, self));
+    self:on(UIEvent.MOUSE_LEAVE_UP, Utils.call(self.onMouseUp, self));
 
 end
 

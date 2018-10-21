@@ -5,7 +5,11 @@
 
 local class = require("node.class");
 local IView = require("node.ui.IView");
-local Timer = require("node.core.Utils.Timer");
+local UIEvent = require("node.core.Event.UIEvent");
+local Utils = require("node.core.Utils.Utils");
+local SliderBoard = require("node.ui.SliderBoard");
+local Tween = require("node.core.Utils.Tween");
+local Ease = require("node.core.Utils.Ease");
 
 ---@type Box
 local Box = require("node.ui.Box")
@@ -56,6 +60,7 @@ List.ItemRender = {};
 function List:ctor()
     Box.ctor(self)
 
+    ---@type Drawable[]
     self._cells = {};
 
     ---@private
@@ -116,6 +121,15 @@ function List:ctor()
     end)
 
 
+    self:setter("startIndex", function(v)
+
+    end)
+
+    self:getter("startIndex", function()
+        return nil;
+    end)
+
+
     self.speaceX = 0;
     self.speaceY = 0;
 
@@ -127,35 +141,56 @@ function List:ctor()
     self.content = SBox.new()
     self.content:addTo(self);
 
+    ---@type fun
+    self.mouseHandler = Utils.void;
+
+    ---@private
+    self._startIndex = 0;
+
+    ---@private
+    self._cellSize = 0;
+
+    ---@private
+    ---@type node2d_ui_sliderboard
+    self._slider = SliderBoard.new();
+    self._slider.direction = 1;
+    self._slider.target = self;
+    self._slider:on(UIEvent.CHANGE, Utils.call(self._onChangeScrollValue, self));
+
+
 end
 
+---@private
 function List:_onResize(...)
     self.content:size(self.width, self.height);
     return Box._onResize(self, ...)
 end
 
+---@private
 function List:_setArray()
     self:changeCells();
-    --local s = IView.createComp(self._itemRender, nil, this);
-    --s:addTo(self);
-
-
+    self._slider:set(0, self._cellSize * #self.array - self.height);
 end
 
 function List:refresh()
-    --Timer:callLater()
     if self.length > 0 then
+        self.array = self.array;
     end
 end
 
+---@private
 ---@return Box
 function List:createItem()
-    local box = IView.createComp(self._itemRender, nil, nil);
-    --if self._itemRender then
-    --end
+    local box;
+    if type(self._itemRender) == "function" then
+        box = self._itemRender();
+    else
+        box = IView.createComp(self._itemRender, nil, nil);
+    end
     return box;
 end
 
+---@private
 function List:changeCells()
     if self._itemRender ~= List.ItemRender then
         local cell = self:_getOneCell();
@@ -175,15 +210,22 @@ function List:changeCells()
             --print(self._height, cellHeight, " - - !")
         end
 
+        if self._isVertical then
+            self._cellSize = cellHeight;
+        else
+            self._cellSize = cellWidth;
+        end
+
 
         local nx = self.repeatX;
         local ny = self.repeatY;
 
-        --print(self.repeatX, self.repeatY, self._repeatX2, self._repeatY2)
-        self:_createItems(0, nx, ny);
+        self:_createItems(0, nx, ny + 1);
 
     end
 end
+
+---@private
 function List:_createItems(startY, numX, numY)
     local content = self.content;
     local cell = self:_getOneCell();
@@ -191,21 +233,45 @@ function List:_createItems(startY, numX, numY)
     local cellWidth = cell.width + self.speaceX;
     local cellHeight = cell.height + self.speaceX;
 
+    local arr = {};
+    for _, v in ipairs(self._cells) do
+        table.insert(arr, v);
+    end
+    self._cells = {};
+
     for y = startY, numY - 1 do
         for x = 0, numX - 1 do
-            local cell = self:createItem();
+            ---@type Box
+            local cell
+            if #arr > 0 then
+                cell = arr[1];
+                table.remove(arr, 1);
+            else
+                cell = self:createItem();
+            end
             cell:pos(cellWidth * x, cellHeight * y);
             content:addChild(cell);
             self:addCell(cell);
         end
     end
-
     self:renderItems(1, 0);
-
 end
 
+---@param box Box
 function List:addCell(box)
+    local fun = Utils.call(self._onMouseEvent, self);
+    box:offAll();
+    box:on(UIEvent.MOUSE_DOWN, fun);
+    box:on(UIEvent.MOUSE_UP, fun);
+    box:on(UIEvent.CLICK, fun);
+    box:on(UIEvent.MOUSE_MOVE, fun);
     table.insert(self._cells, box);
+end
+
+---@param e node2d_core_event_event
+function List:_onMouseEvent(e)
+    local p = Utils.tableIndexOf(self._cells, e.currentTarget);
+    self.mouseHandler(e, self._startIndex + p);
 end
 
 ---@private
@@ -231,7 +297,6 @@ function List:renderItem(cell, index)
         cell.visible = false;
         cell.dataSource = nil;
     end
-
 end
 
 ---@private
@@ -240,23 +305,91 @@ function List:renderItems(from, length)
         length = #self._cells;
     end
     for i = from, length do
-        self:renderItem(self._cells[i], i);
+        self:renderItem(self._cells[i], self._startIndex + i);
+    end
+end
+
+---@private
+---@param x number
+---@param y number
+function List:cellOffset(x, y)
+    for _, item in ipairs(self._cells) do
+        item:pivot(x, y);
+    end
+end
+
+---@private
+function List:_onChangeScrollValue()
+    local scvalue = self._slider.x;
+    if self._isVertical then
+        scvalue = self._slider.y;
+    end
+    local dv = scvalue / self._cellSize;
+    self._startIndex = math.floor(dv);
+    local d = dv - self._startIndex;
+    local offset = d * self._cellSize;
+
+    self:changeCells();
+    if self._isVertical then
+        self:cellOffset(0, offset)
+    else
+        self:cellOffset(offset, 0);
+    end
+end
+
+
+---@param index number
+function List:scrollTo(index)
+    if index > self.length then
+        index = self.length;
+    end
+    if index < 1 then
+        index = 1;
+    end
+    if self._isVertical then
+        self._slider.y = self._cellSize * index;
+        self:_onChangeScrollValue()
+    else
+        self._slider.x = self._cellSize * index;
+        self:_onChangeScrollValue()
     end
 end
 
 ---@param index number
+---@param time number
+function List:tweenTo(index, time)
+    if index > self.length then
+        index = self.length;
+    end
+    if index < 1 then
+        index = 1;
+    end
+    local function onchange(...)
+        self:_onChangeScrollValue();
+        return Ease.linear(...)
+    end
+    local target = {}
+    if self._isVertical then
+        target.y = index * self._cellSize;
+    else
+        target.x = index * self._cellSize;
+    end
+    Tween.to(self._slider, target, time, onchange, Utils.call(self._onChangeScrollValue, self));
+end
+
+
+---@private
+---@param index number
 ---@return Box
 function List:getCell(index)
-
 end
 
-
-function List:addItem(src)
-
-end
-
-function List:removeItem(src)
-
-end
+--function List:addItem(src)
+--
+--end
+--
+--function List:removeItem(src)
+--
+--end
 
 return List;

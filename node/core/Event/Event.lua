@@ -3,8 +3,8 @@
 --- DateTime: 2018/10/18 22:36
 ---
 
+local class = require("node.class");
 local UIEvent = require("node.core.Event.UIEvent");
-
 ---@class node2d_core_event_event : node2d_core_event_uievent
 local c = class(UIEvent)
 
@@ -16,6 +16,7 @@ function c:ctor()
     self.keyCode = nil;
     self.target = nil;
     self.currentTarget = nil;
+    self.touchId = nil;
 end
 
 

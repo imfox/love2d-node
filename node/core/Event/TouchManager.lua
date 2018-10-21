@@ -3,9 +3,9 @@
 --- DateTime: 2018/10/18 21:17
 ---
 
+local class = require("node.class");
 local UIEvent = require("node.core.Event.UIEvent");
 local Event = require("node.core.Event.Event");
-local Utils = require("node.core.Utils.Utils");
 
 ---@class node2d_core_event_touchmanager : Klass
 local c = class()
@@ -19,25 +19,52 @@ function c:ctor()
 end
 
 ---@param node Drawable
-function c:mouseDown(node)
+function c:mouseDown(node, id)
     local list = self:getNodes(node);
-    table.insert(self.press, node)
+    self:_addPress(id, node);
     self:sendEvents(list, UIEvent.MOUSE_DOWN);
 end
 
 ---@param node Drawable
-function c:mouseUp(node)
+function c:mouseUp(node, id)
     local list = self:getNodes(node);
     self:sendEvents(list, UIEvent.MOUSE_UP);
-    if Utils.tableIndexOf(self.press, node) > 0 then
-        self:sendEvents(list, UIEvent.CLICK);
+    ---@type Drawable[]
+    local prs = self:_getPress(id);
+    for _, n in ipairs(prs) do
+        if node == n then
+            self:sendEvents(list, UIEvent.CLICK);
+        else
+            n:event(UIEvent.MOUSE_LEAVE_UP);
+            --self:sendEvents(v, UIEvent.MOUSE_LEAVE_UP);
+        end
     end
+    self.press[id] = nil;
 end
 
 ---@param node Drawable
-function c:mouseMove(node)
+function c:mouseMove(node, id)
     local list = self:getNodes(node);
     self:sendEvents(list, UIEvent.MOUSE_MOVE);
+end
+
+---@private
+---@param id any
+---@param node Drawable
+function c:_addPress(id, node)
+    if not self.press[id] then
+        self.press[id] = {};
+    end
+    table.insert(self.press[id], node);
+end
+
+
+---@private
+function c:_getPress(id)
+    if self.press[id] then
+        return self.press[id];
+    end
+    return {};
 end
 
 ---@private

@@ -106,10 +106,18 @@ function Tween:resume()
     self._pause = false
 end
 
+---@private
+function Tween:onComplete()
+    for k, v in pairs(self.target) do
+        self.subject[k]=v;
+    end
+end
+
 function Tween:update(dt)
     assert(type(dt) == "number", "dt must be a number")
     local over = self:set(self.clock + dt)
     if (over) then
+        self:onComplete();
     end
     return over
 end
