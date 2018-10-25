@@ -13,19 +13,34 @@ local Timer = require("node.core.Utils.Timer")
 
 local UIEvent = require("node.core.Event.UIEvent");
 
-local translate, pop, push = love.graphics.translate, love.graphics.pop, love.graphics.push
+local translate, pop, push, newTransform = love.graphics.translate, love.graphics.pop, love.graphics.push, love.math.newTransform
+local gr = love.graphics
+
+---@param a Drawable
+---@param b Drawable
+local function _sort(a, b)
+    local this = a.parent;
+    if a.zOrder == b.zOrder then
+        return this.sortTabel[a] < this.sortTabel[b];
+    end
+    return a.zOrder < b.zOrder;
+end
+
 
 ---@type Drawable[]
 local renderLine = {}
 
 ---@class Drawable : Node
 ---@field displayedInStage boolean @readonly
+---@field protected _draw:fun()
+---@field zOrder number
+---@field parent Drawable
 local Drawable = class(Node);
 
 ---@param this Drawable
 function Drawable.ctor(this)
     Node.ctor(this)
-    this.transform = love.math.newTransform();
+    this.transform = newTransform();
 
     this:setter("x", function(v)
         this._x = v;
@@ -82,27 +97,40 @@ function Drawable.ctor(this)
     end)
     this:getter("rotation", function()
         return this._rotation or 0;
+
     end)
 
-    this.zOrder = 0;
     this.x = 0;
     this.y = 0;
     this.scaleX = 1;
     this.scaleY = 1;
     this.pivotX = 0;
     this.pivotY = 0;
+    this.blendMode = "";
 
     --this.width = 0;
     --this.height = 0;
     this.alpha = 1;
     this.rotation = 0;
     this.visible = true;
-    this.id = Utils.getGID();
+    this._gid = Utils.getGID();
 
     ---@protected
     this._canvas = nil;
     ---@protected
     this.renderArea = nil;
+
+    this._zOrder = 0;
+    this:setter("zOrder", function(v)
+        this._zOrder = v;
+        if this.parent then
+            this.parent:zOrderSort()
+        end
+    end)
+    this:getter("zOrder", function()
+        return this._zOrder;
+    end)
+
 
     this._width = nil
     this:setter("width", function(v)
@@ -133,7 +161,7 @@ function Drawable.ctor(this)
             end
             node = node.parent;
         end
-        return node.id == 1 and node.visible;
+        return node._gid == 1 and node.visible;
     end)
     this.mouseEnabled = false;
 
@@ -170,12 +198,18 @@ function Drawable.addChildAt(this, node, index)
     if node.mouseEnabled then
         _mouseEnable(this);
     end
+    this:zOrderSort()
 end
 function Drawable.removeChildAt(this, node, index)
     Node.removeChildAt(this, node, index)
     if this.sortTabel then
         this.sortTabel[node] = nil
     end
+end
+
+---@public
+function Drawable:zOrderSort()
+    table.sort(self.components, _sort);
 end
 
 ---@field public x number
@@ -289,31 +323,23 @@ end
 function Drawable.globalToLocal(this, x, y)
     return x, y;
 end
----@param a Drawable
----@param b Drawable
-local function _sort(a, b)
-    local this = a.parent;
-    if a.zOrder == b.zOrder then
-        return this.sortTabel[a] < this.sortTabel[b];
-    end
-    return a.zOrder < b.zOrder;
-end
 
 ---@protected
 ---@param this Drawable
+---@param graphics graphics
 ---@return Drawable
 function Drawable._render(this, graphics)
-    if not this.visible or this.destroyed or this.alpha == 0 or this.scaleY == 0 or this.scaleX == 0 then
+    if not this.visible or this.destroyed or this.alpha == 0 or this._scaleY == 0 or this._scaleX == 0 then
         -- 已经不会显示出来了
         return this;
     end
-    local r, g, b, a = this:_push()
+    local r, g, b, a, blendMode = this:_push()
+
     if this._draw then
         this._draw(this, graphics);
     end
-    table.sort(this.components, _sort)
     this:_renderChildren(graphics);
-    return this:_pop(r, g, b, a)
+    return this:_pop(r, g, b, a, blendMode)
 end
 
 ---@protected
@@ -332,36 +358,48 @@ end
 ---@protected
 ---@return number,number,number,number
 function Drawable._push(this)
-    local r, g, b, a = love.graphics.getColor()
-    love.graphics.setColor(r, g, b, this.alpha * a)
+    local r, g, b, a = gr.getColor()
+    gr.setColor(r, g, b, this.alpha * a)
+    local blendMode
+    if this.blendMode == "lighter" then
+        blendMode = gr.getBlendMode();
+        gr.setBlendMode("add")
+    end
     push()
-    love.graphics.applyTransform(this.transform);
-    return r, g, b, a;
+    gr.applyTransform(this.transform);
+    return r, g, b, a, blendMode;
 end
 
 ---@protected
 ---@return Drawable
-function Drawable._pop(this, r, g, b, a)
-    love.graphics.setColor(r, g, b, a)
+function Drawable._pop(this, r, g, b, a, blendMode)
+    gr.setColor(r, g, b, a)
+    if blendMode then
+        gr.setBlendMode(blendMode)
+    end
     pop()
     return this;
 end
 
+-----@protected
+-----@param graphics graphics
+--function Drawable:_draw(graphics)
+--end
+
 ---@protected
----@param graphics graphics
-function Drawable:_draw(graphics)
+---@param dw Drawable
+function Drawable._transform(this)
+    this.transform:reset();
+    this.transform:translate(this.x, this.y);
+    this.transform:rotate(math.rad(this.rotation));
+    this.transform:scale(this.scaleX, this.scaleY);
+    -- this.transform:translate(-this.pivotX,-this.pivotY);
 end
 
 ---@protected
 ---@param this Drawable
 function Drawable._calcTransform(this)
-    Timer:callLater(this, function(this)
-        this.transform:reset();
-        this.transform:translate(this.x, this.y);
-        this.transform:rotate(math.rad(this.rotation));
-        this.transform:scale(this.scaleX, this.scaleY);
-        -- this.transform:translate(-this.pivotX,-this.pivotY);
-    end, this)
+    Timer:callLater(this, this._transform, this)
 end
 
 ---@protected

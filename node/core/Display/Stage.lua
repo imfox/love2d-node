@@ -26,12 +26,11 @@ local Stage
 ---@class stage : Drawable
 local stage = class(Drawable);
 
----@param this stage
-function stage.ctor(this)
-    Drawable.ctor(this)
-    this.name = "Stage"
-    this.mouseEnabled = true;
-    this.id = 1;
+function stage:ctor()
+    Drawable.ctor(self)
+    self.name = "Stage"
+    self.mouseEnabled = true;
+    self._gid = 1;
 end
 
 ---@param this stage
