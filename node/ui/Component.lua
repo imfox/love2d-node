@@ -215,8 +215,10 @@ end
 ---@param this Component
 function Component._repaintChilds(this)
     this:_onResize()
-    for i=1,this:numChild() do
-        this:getChildAt(i):_repaintChilds()
+    for _, dw in ipairs(this.components) do
+        if dw._repaintChilds then
+            dw:_repaintChilds()
+        end
     end
 end
 

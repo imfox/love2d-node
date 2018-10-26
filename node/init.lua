@@ -11,7 +11,7 @@
 class = require("node.class");
 import = require("node.import");
 
-
+local Utils = require("node.core.Utils.Utils");
 local MouseManager = require("node.core.Event.MouseManager");
 
 local Node = require("node.core.Display.Node");
@@ -132,14 +132,14 @@ local function mousereleased(x, y, button, istouch)
     if button == 2 then
         type = UIEvent.RMOUSE_UP
     end
-    mouseEvent(type, 1, x, y)
+    mouseEvent(type, button, x, y)
 end
 local function mousepressed(x, y, button, istouch)
     local type = UIEvent.MOUSE_DOWN;
     if button == 2 then
         type = UIEvent.RMOUSE_DOWN
     end
-    mouseEvent(type, 1, x, y)
+    mouseEvent(type, button, x, y)
 end
 local function mousemoved( x, y, dx, dy, istouch)
     mouseEvent(UIEvent.MOUSE_MOVE, 1, x, y)
@@ -166,6 +166,7 @@ local export = {
     Tween = Tween,
     UIEvent = UIEvent,
     UIUtils = UIUtils,
+    Utils = Utils,
     Ease = Ease,
     Font = Font,
 

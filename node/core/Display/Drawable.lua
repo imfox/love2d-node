@@ -122,13 +122,15 @@ function Drawable.ctor(this)
 
     this._zOrder = 0;
     this:setter("zOrder", function(v)
-        this._zOrder = v;
-        if this.parent then
-            this.parent:zOrderSort()
+        if this._zOrder ~= v then
+            this._zOrder = v;
+            if this.parent then
+                Timer:callLater(this.parent, this.parent.zOrderSort)
+            end
         end
     end)
     this:getter("zOrder", function()
-        return this._zOrder;
+        return this._zOrder or 0;
     end)
 
 
@@ -194,7 +196,7 @@ end
 function Drawable.addChildAt(this, node, index)
     Node.addChildAt(this, node, index)
     this.sortTabel = this.sortTabel or {}
-    this.sortTabel[node] = this:numChild() + 1;
+    this.sortTabel[node] = Utils.getGID();    --this:numChild() + 1
     if node.mouseEnabled then
         _mouseEnable(this);
     end
