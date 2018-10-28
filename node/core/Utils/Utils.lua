@@ -117,8 +117,8 @@ function Utils.call(func, caller, ...)
     local args = { ... }
     return function(...)
         local params = { ... };
-        for i, v in ipairs(args) do
-            table.insert(params, i, v);
+        for i = #args, 1, -1 do
+            table.insert(params, 1, args[i]);
         end
         if caller then
             return func(caller, unpack(params))

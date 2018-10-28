@@ -28,6 +28,35 @@ function ScaleButton.ctor(this, skin)
     this:on(UIEvent.MOUSE_UP, Tween.to, { this, { scaleX = 1, scaleY = 1 }, 100, Ease.inBack, void });
     this:on(UIEvent.MOUSE_LEAVE_UP, Tween.to, { this, { scaleX = 1, scaleY = 1 }, 100, Ease.inBack, void });
 
+
+    this:setter("dataSource", function(d)
+        this._dataSource = d;
+        if d then
+            if type(d) == "string" then
+                this.skin = d;
+            elseif type(d) == "table" then
+                for k, v in pairs(d) do
+                    if type(this[k]) == "table" then
+                        this[k].dataSource = v;
+                    elseif this[k] ~= nil then
+                        this[k] = v;
+                    else
+                        local child = this:getChildByName(k)
+                        if child then
+                            child.dataSource = v
+                        else
+                            this[k] = v;
+                        end
+                    end
+                end
+            end
+        end
+    end)
+
+    this:getter("dataSource", function()
+        return this._dataSource;
+    end)
+
 end
 
 

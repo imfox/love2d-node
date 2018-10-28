@@ -74,7 +74,14 @@ end
 ---@param x number
 ---@param y number
 local function hitTest(node, x, y)
-    return (Utils.pointHitRect(x, y, -node.pivotX * node.scaleX, -node.pivotY * node.scaleY, node.width * node.scaleX, node.height * node.scaleY));
+    if node.width > 0 and node.height > 0 or node.mouseThrough then
+        if node.mouseThrough then
+            return false;
+        else
+            return Utils.pointHitRect(x, y, -node.pivotX * node.scaleX, -node.pivotY * node.scaleY, node.width * node.scaleX, node.height * node.scaleY);
+        end
+    end
+    return false;
 end
 
 ---@private
@@ -91,7 +98,7 @@ function c:check(node, x, y, callback)
 
     if not self.disableMouseEvent then
         node.mouseX, node.mouseY = nx, ny;
-        if not hitTest(node, nx, ny) then
+        if not node.mouseThrough and not hitTest(node, nx, ny) then
             return false;
         end
 
@@ -108,7 +115,14 @@ function c:check(node, x, y, callback)
 
     end
 
-    local hit = hitTest(node, nx, ny);
+    local hit = false;
+
+    if not node.mouseThrough and not disableMouseEvent then
+        hit = true;    
+    else
+        hit = hitTest(node, nx, ny);
+    end
+
 
     if hit then
         Utils.call(callback, self, node)()

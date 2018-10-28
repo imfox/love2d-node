@@ -109,15 +109,17 @@ function Sprite.ctor(this, skin)
     end)
 
 
-    ---@protected
-    this._dataSource = nil;
     this:setter("dataSource", function(d)
         if d then
             if type(d) == "string" then
                 this.skin = d;
-            else
+            elseif type(d) == "table" then
                 for k, v in pairs(d) do
-                    this[k] = v;
+                    if type(this[k]) == "table" then
+                        this[k].dataSource = v;
+                    else
+                        this[k] = v;
+                    end
                 end
             end
         end

@@ -166,6 +166,7 @@ function Drawable.ctor(this)
         return node._gid == 1 and node.visible;
     end)
     this.mouseEnabled = false;
+    this.mouseThrough = false;
 
 end
 

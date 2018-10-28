@@ -117,7 +117,25 @@ function Component.ctor(this)
     this.tag = nil;
     this.gray = false;
     this.disabled = false;
-    this.dataSource = nil;
+
+    ---@protected
+    this._dataSource = nil;
+    this:setter("dataSource", function(d)
+        if d and type(d) == "table" then
+            for k, v in pairs(d) do
+                if type(this[k]) == "table" then
+                    this[k].dataSource = v;
+                else
+                    this[k] = v;
+                end
+            end
+        end
+        this._dataSource = d;
+    end)
+
+    this:getter("dataSource", function()
+        return this._dataSource;
+    end)
 
     -- [[ 自动根据自身或者子组件来制定自身的范围 --]]
     this.autoSize = true;
