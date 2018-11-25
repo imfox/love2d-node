@@ -11,11 +11,14 @@
 ## 示例(example)
 #### 1.初始化 (Initialization)
 ```lua
-local Node = require("node.init")("unknow",800,600).register()
+local Node = require("Node.Core.Init");
+Node.init(800,600);
+Node.register();
 ```
 #### 2.显示图片 (Image)
 ```lua
-local img = Node.Image.new("res/1.png"):addTo(Node.stage);
+local Laya = require("Node.Laya.Namespace");
+Laya.Image.new("res/1.png"):addTo(Node.stage);
 ```
 
 ## 工具(tools)
