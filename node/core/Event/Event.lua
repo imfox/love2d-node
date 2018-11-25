@@ -1,39 +1,21 @@
----
---- Created by fox.
---- DateTime: 2018/10/18 22:36
----
+local Class = require("Node.Core.Class");
+---@class Node_Core_Event_Event
+local c = Class();
 
-local class = require("node.class");
-local UIEvent = require("node.core.Event.UIEvent");
----@class node2d_core_event_event : node2d_core_event_uievent
-local c = class(UIEvent)
+c.RESIZE = "RESIZE"
 
-function c:ctor()
-    self.stoped = false;
-    self.mouseX = 0;
-    self.mouseY = 0;
-    self.type = nil;
-    self.keyCode = nil;
-    self.target = nil;
-    self.currentTarget = nil;
-    self.touchId = nil;
-end
+c.ADDED = "ADDED"
+c.REMOVED = "REMOVED"
+c.BEFORE_REMOVE = "BEFORE_REMOVE"
 
+c.KEY_DOWN = "KEY_DOWN"
+c.KEY_UP = "KEY_UP"
+c.KEY_PRESS = "KEY_PRESS"
 
----@param type string
----@param currentTarget Drawable
----@param target Drawable
----@return node2d_core_event_event
-function c:set(type, currentTarget, target)
-    self.type = type;
-    self.currentTarget = currentTarget;
-    self.target = target;
-    return self;
-end
-
----@return void
-function c:stopPropagation()
-    self.stoped = true;
-end
+c.MOUSE_LEAVE_UP = "MOUSE_LEAVE_UP"
+c.TOUCH_RELEASE_OUTSIDE = "TOUCH_RELEASE_OUTSIDE";
+c.CHANGE = "CHANGE"
+c.FOCUS = "FOCUS"
+c.BLUR = "BLUR";
 
 return c;

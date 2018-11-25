@@ -1,186 +1,195 @@
---local import = require("Import");
-local class = require("node.class");
+local Class = require("Node.Core.Class");
+local Event = require("Node.Core.Event.Event");
+local EventDispatcher = require("Node.Core.Event.EventDispatcher");
 
----@type Message
-local Message = require("node.core.Display.Message")
-
----@class Node : Message
-local Node =  class(Message);
----@field public new Node
----@field protected components Node[] @子组件数组
+---@class Node_Core_Display_Node : Node_Core_Event_EventDispatcher
+local c = Class(EventDispatcher);
+---@field public new Node_Core_Display_Node
+---@field protected _childs Node_Core_Display_Node[] @子组件数组
 ---@field public name string @名称
----@field public parent Node @父对象
+---@field public parent Node_Core_Display_Node @父对象
 ---@field public destroyed boolean @是否已经被销毁
 
-function Node:ctor()
-    Message.ctor(self)
+function c:ctor()
+    EventDispatcher.ctor(self)
     self.name = "";
-    ---@type Node[]
-    self.components = {};
+    ---@type Node_Core_Display_Node[]
+    self._childs = {};
     self.parent = nil;
     self.destroyed = false;
 end
 
----@param node Node
----@return Node
----@param this Node
-function Node.addChild(this,node)
-    this.addChildAt(this,node,nil);
-    return this;
+---@param node Node_Core_Display_Node
+---@return Node_Core_Display_Node
+function c:addChild(node)
+    self:addChildAt(node, #self._childs + 1);
+    return self;
 end
 
----@param this Node
----@param node Node
+---@param node Node_Core_Display_Node
 ---@param index number
----@return Node
-function Node.addChildAt(this,node,index)
-    if this.destroyed or node == nil or node.destroyed or node == this then
-        return this;
+---@return Node_Core_Display_Node
+function c:addChildAt(node, index)
+    if self.destroyed or node == nil or node.destroyed or node == self then
+        return self;
+    end
+    -- 有可能是自己的祖节点
+    local p = self;
+    while p do
+        p = p.parent;
+        if p == node then
+            self:removeSelf();
+            break
+        end
     end
     if node.parent then
-        node.parent.removeChild(node.parent,node);
+        node.parent:removeChild(node);
     end
-    table.insert(this.components,index==nil and #this.components+1 or index,node);
-    node.parent = this;
-    return this;
+    index = math.min(index, #self._childs + 1);
+    table.insert(self._childs, index, node);
+    node:event(Event.ADDED);
+    node.parent = self;
+    return self;
 end
 
----@param node Node
----@return Node
----@param this Node
-function Node.removeChild(this,node)
-    return this:removeChildAt(this:getChildIndex(node))
+---@param ... Node_Core_Display_Node[]
+---@return Node_Core_Display_Node
+function c:addChildren(...)
+    local ns = { ... };
+    for _, n in ipairs(ns) do
+        self:addChild(n);
+    end
+    return self;
 end
 
----@param name string
----@return Node
----@param this Node
-function Node.removeChildByName(this,name)
-    return this:removeChild(this:getChildByName(name));
+---@param parent Node_Core_Display_Node
+---@return Node_Core_Display_Node
+function c:addTo(parent)
+    parent:addChild(self);
+    return self;
+end
+
+---@param node Node_Core_Display_Node
+---@return Node_Core_Display_Node
+function c:removeChild(node)
+    return self:removeChildAt(self:getChildIndex(node))
 end
 
 ---@param index number
----@return Node
----@param this Node
-function Node.removeChildAt(this,index)
-    ---@type Node
-    local node = table.remove(this.components,index);
-    node.parent = nil;
-    return this;
+---@return Node_Core_Display_Node
+function c:removeChildAt(index)
+    ---@type Node_Core_Display_Node
+    local node = table.remove(self._childs, index);
+    if node then
+        node.parent = nil;
+        node:event(Event.REMOVED);
+    end
+    return node;
 end
 
 ---@param name string
----@return Node
----@param this Node
-function Node.getChildByName(this,name)
-    for index = #this.components, 1 ,-1 do
-        if(name == this.components[index].name) then
-            return this.components[index];
+---@return Node_Core_Display_Node
+function c:removeChildByName(name)
+    return self:removeChild(self:getChildByName(name));
+end
+
+---@return Node_Core_Display_Node
+---@param begin number
+---@param endl number
+function c:removeChildren(begin, endl)
+    begin = begin or 1;
+    endl = endl or self:numChild();
+    for i = endl, begin, -1 do
+        self:removeChildAt(i);
+    end
+    return self;
+end
+
+---@return Node_Core_Display_Node
+function c:removeSelf()
+    if self.parent ~= nil then
+        self.parent:removeChild(self);
+    end
+    return self;
+end
+
+---@param name string
+---@return Node_Core_Display_Node
+function c:getChildByName(name)
+    for index = #self._childs, 1, -1 do
+        if (name == self._childs[index].name) then
+            return self._childs[index];
         end
     end
 end
 
 ---@param index number
----@return Node
----@param this Node
-function Node.getChildAt(this,index)
-    return this.components[index];
+---@return Node_Core_Display_Node
+function c:getChildAt(index)
+    return self._childs[index];
 end
 
----@param node Node
+---@param node Node_Core_Display_Node
 ---@return number
----@param this Node
-function Node.getChildIndex(this,node)
-    for index = #this.components, 1, -1 do
-        if(node == this.components[index]) then
+function c:getChildIndex(node)
+    for index = #self._childs, 1, -1 do
+        if (node == self._childs[index]) then
             return index;
         end
     end
     return -1;
 end
 
----@return Node
----@param this Node
-function Node.removeSelf(this)
-    if this.parent ~= nil then
-        this.parent:removeChild(this);
-    end
-    return this;
-end
-
----@return Node
----@param this Node
----@param begin number
----@param endl number
-function Node.removeChildren(this,begin,endl)
-    begin = begin or 1;
-    endl = endl or this:numChild();
-    for i = 0, math.min(endl-begin,0) do
-        this:removeChildAt(begin);
-    end
-    return this;
-end
-
----@param this Node
----@param parent Node
----@return Node
-function Node.addTo(this,parent)
-    parent:addChild(this);
-    return this;
-end
-
----@param this Node
----@param newNode Node
----@param node Node
----@return Node
-function Node.replaceChild(this,node ,newNode)
-    local index = this:getChildIndex(node);
+---@param newNode Node_Core_Display_Node
+---@param node Node_Core_Display_Node
+---@return Node_Core_Display_Node
+function c:replaceChild(node, newNode)
+    local index = self:getChildIndex(node);
     if index > 0 and newNode then
         if newNode.parent then
             local nIndex = newNode.parent:getChildIndex(newNode);
-            newNode.parent:addChildAt(node,nIndex);
+            newNode.parent:addChildAt(node, nIndex);
         else
             node:removeSelf();
         end
-        this:addChildAt(newNode,index);
+        self:addChildAt(newNode, index);
     end
-    return this;
+    return self;
 end
 
----@param this Node
----@param node Node
+---@param node Node_Core_Display_Node
 ---@return boolean
-function Node.contains(this,node)
-    return this:getChildIndex(node) > 0;
+function c:contains(node)
+    return self:getChildIndex(node) > 0;
 end
 
----@param this Node
+---@return number
+function c:numChild()
+    return #self._childs;
+end
+
 ---@param destroyChild boolean
 ---@return void
-function Node.destroy(this,destroyChild)
-    if this.destroyed then return end
-    this.destroyed = true;
-    this:removeSelf();
+function c:destroy(destroyChild)
+    if self.destroyed then
+        return
+    end
+    self.destroyed = true;
+    self:removeSelf();
     if destroyChild ~= false then
-        this:destroyChildren();
+        self:destroyChildren();
     end
-    this.name = nil;
-    this.components = nil
-    this.parent = nil;
-    this:offAll();
+    self.name = nil;
+    self._childs = nil
+    self.parent = nil;
+    self:offAll();
 end
 
----@param this Node
----@return number
-function Node.numChild(this)
-    return #this.components;
-end
-
----@param this Node
----@return Node
-function Node.destroyChildren(this)
-    for i = #this.components,1,-1 do
-        this.components[i]:destroy(true);
+---@return Node_Core_Display_Node
+function c:destroyChildren()
+    for i = #self._childs, 1, -1 do
+        self._childs[i]:destroy(true);
     end
 end
-return Node;
+
+return c;

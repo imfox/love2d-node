@@ -1,49 +1,100 @@
----
---- Created by fox.
---- DateTime: 2018/3/27 22:08
----
-local class = require("node.class")
+local Class = require("Node.Core.Class");
+local Drawable = require("Node.Core.Display.Drawable");
+local Event = require("Node.Core.Event.Event");
+local TouchManager = require("Node.Core.Event.TouchManager").instance;
+local gr = love.graphics;
 
-local Drawable = require("node.core.Display.Drawable");
+---@class Node_Core_Display_Stage : Node_Core_Display_Drawable
+local c = Class(Drawable);
+function c:ctor()
+    Drawable.ctor(self);
 
----@param this Drawable
---local function drawRect(this,x,y,r,w,h,mouseX,mouseY) --这个方法是用来渲染出组件的包围盒的
---    local px,py,pr,pw,ph = (this.x-this.pivotX*this.scaleX)*w,(this.y-this.pivotY*this.scaleY)*h,r,((this.width)*this.scaleX)*w,((this.height)*this.scaleY)*h
---    love.graphics.rectangle("line",x+px,y+py,pw,ph)
---    if this:numChild() > 0 then
---        for i=1,this:numChild() do
---            ---@type Drawable
---            local node = this:getChildAt(i);
---            drawRect(node,x+px,y+py,this.rotation,this.scaleX*w,this.scaleY*h);
---        end
---    end
---
---end
-
----@type stage
-local Stage
-
----@class stage : Drawable
-local stage = class(Drawable);
-
-function stage:ctor()
-    Drawable.ctor(self)
-    self.name = "Stage"
-    self.mouseEnabled = true;
     self._gid = 1;
+    self.offsetX = 0;
+    self.offsetY = 0;
+    self.screenScaleX = 1;
+    self.screenScaleY = 1;
+    self._bgColor = nil;
+    self.bgColor = 0xffffff;
+
+    self._scaleMode = "SHOWALL";
 end
 
----@param this stage
+function c:update(dt)
+    TouchManager:runEvent();
+end
+
+function c:draw()
+    gr.push()
+    gr.translate(self.offsetX, self.offsetY)
+    gr.scale(self.screenScaleX, self.screenScaleY)
+    self:__render(gr);
+    gr.pop()
+
+    if self.offsetX ~= 0 or self.offsetY ~= 0 then
+        --隐藏其它...比较搓
+        local w, h = gr.getWidth(), gr.getHeight()
+        gr.setColor(0.1, 0.1, 0.1, 1)
+        gr.rectangle("fill", 0, 0, self.offsetX, h)
+        gr.rectangle("fill", 0, 0, w, self.offsetY)
+        gr.rectangle("fill", w - self.offsetX, 0, self.offsetX, h)
+        gr.rectangle("fill", 0, h - self.offsetY, w, self.offsetY)
+        gr.setColor(1, 1, 1, 1)
+    end
+
+end
+
+---@param w number
+---@param h number
+function c:setSceenSize(w, h)
+    self:event(Event.RESIZE);
+    
+    local sw = gr.getWidth();
+    local sh = gr.getHeight();
+
+    self.width = w;
+    self.height = h;
+
+    local minScale = math.min(sw / self.width, sh / self.height)
+    self.screenScaleX, self.screenScaleY = minScale, minScale
+    self.offsetX, self.offsetY = (sw - (self.width * minScale)) / 2, (sh - (self.height * minScale)) / 2;
+end
+
+function c:keyboardEvent()
+    --TouchManager:onTouch(Event.MOUSE_DOWN, 1, 115, 877)
+end
+
+---@private
+function c:touchPoint(x, y)
+    x = x - self.offsetX
+    x = x / (self.screenScaleX * self.width) * self.width
+    if (x < 0 or x > self.width) then
+        x = -1
+    end
+
+    y = y - self.offsetY
+    y = y / (self.screenScaleY * self.height) * self.height
+    if (y < 0 or y > self.height) then
+        y = -1;
+    end
+    return x, y
+end
+
 ---@param type string
-function stage.keyboardEvent(this, type, key)
-    this:event(type, { key })
-    return this
+---@param id any
+---@param x number
+---@param y number
+function c:onMouseEvent(type, id, x, y)
+    local nx, ny = self:touchPoint(x, y);
+    if nx > 0 and ny > 0 then
+        TouchManager:onTouch(type, id, nx, ny);
+    end
 end
 
----@param this stage
-function stage.draw(this, graphics)
-    this:_render(graphics)
+function c:_changeWindowSize()
+    self:setSceenSize(self.width, self.height);
 end
 
-Stage = stage.new();
-return Stage;
+c.instance = c.new();
+TouchManager:setStage(c.instance);
+return c;

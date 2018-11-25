@@ -1,23 +1,15 @@
----
---- Created by fox.
---- DateTime: 2018/3/15 20:42
----
-local class = require("node.class");
+local Class = require("Node.Core.Class");
+local Node = require("Node.Core.Display.Node");
+local Util = require("Node.Core.Utils.Utils");
+local TouchEvent = require("Node.Core.Event.TouchEvent");
 
-local Utils = require("node.core.Utils.Utils");
-
----@type Node
-local Node = require("node.core.Display.Node");
-local Message = require("node.core.Display.Message")
-local Timer = require("node.core.Utils.Timer")
-
-local UIEvent = require("node.core.Event.UIEvent");
-
-local translate, pop, push, newTransform = love.graphics.translate, love.graphics.pop, love.graphics.push, love.math.newTransform
 local gr = love.graphics
+local translate, pop, push, applyTransform, newTransform = gr.translate, gr.pop, gr.push, gr.applyTransform, love.math.newTransform
+local getColor, setColor = gr.getColor, gr.setColor
+local setBlendMode, getBlendMode = gr.setBlendMode, gr.getBlendMode
 
----@param a Drawable
----@param b Drawable
+---@param a Node_Core_Display_Drawable
+---@param b Node_Core_Display_Drawable
 local function _sort(a, b)
     local this = a.parent;
     if a.zOrder == b.zOrder then
@@ -26,389 +18,356 @@ local function _sort(a, b)
     return a.zOrder < b.zOrder;
 end
 
-
----@type Drawable[]
-local renderLine = {}
-
----@class Drawable : Node
----@field displayedInStage boolean @readonly
----@field protected _draw:fun()
+---@class Node_Core_Display_Drawable : Node_Core_Display_Node
+---@field parent Node_Core_Display_Drawable
+---@field _childs Node_Core_Display_Drawable[]
+---@field x number
+---@field y number
 ---@field zOrder number
----@field parent Drawable
-local Drawable = class(Node);
+---@field pivotX number
+---@field pivotY number
+---@field width number
+---@field height number
+---@field rotation number
+---@field scaleX number
+---@field scaleY number
+---@field blendMode string
+---@field alpha number
+---@field touchEnabled boolean
+---@field touchThrough boolean
+local c = Class(Node);
 
----@param this Drawable
-function Drawable.ctor(this)
-    Node.ctor(this)
-    this.transform = newTransform();
+function c:ctor()
+    Node.ctor(self);
 
-    this:setter("x", function(v)
-        this._x = v;
-        this:_calcTransform()
-    end)
-    this:getter("x", function()
-        return this._x or 0;
-    end)
+    self._gid = Util.getGID();
 
-    this:setter("y", function(v)
-        this._y = v;
-        this:_calcTransform()
-    end)
+    self.width = 0;
+    self.height = 0;
+    self.alpha = 1;
+    self.blendMode = nil;
+    self.transform = newTransform();
 
-    this:getter("y", function()
-        return this._y or 0;
-    end)
+    self.pivotX = 0;
+    self.pivotY = 0;
 
-    this:setter("scaleX", function(v)
-        this._scaleX = v or 1;
-        this:_calcTransform()
-    end)
-    this:getter("scaleX", function()
-        return this._scaleX or 1;
-    end)
+    self.visible = true;
 
-    this:setter("scaleY", function(v)
-        this._scaleY = v or 1;
-        this:_calcTransform()
-    end)
-    this:getter("scaleY", function()
-        return this._scaleY or 1;
-    end)
-
-    this:setter("pivotX", function(v)
-        this._pivotX = v;
-        this:_calcTransform()
-    end)
-    this:getter("pivotX", function()
-        return this._pivotX or 1;
-    end)
-
-    this:setter("pivotY", function(v)
-        this._pivotY = v;
-        this:_calcTransform()
-    end)
-    this:getter("pivotY", function()
-        return this._pivotY or 0;
-    end)
-
-    this:setter("rotation", function(v)
-        this._rotation = v;
-        this:_calcTransform()
-    end)
-    this:getter("rotation", function()
-        return this._rotation or 0;
-
-    end)
-
-    this.x = 0;
-    this.y = 0;
-    this.scaleX = 1;
-    this.scaleY = 1;
-    this.pivotX = 0;
-    this.pivotY = 0;
-    this.blendMode = "";
-
-    --this.width = 0;
-    --this.height = 0;
-    this.alpha = 1;
-    this.rotation = 0;
-    this.visible = true;
-    this._gid = Utils.getGID();
-
-    ---@protected
-    this._canvas = nil;
-    ---@protected
-    this.renderArea = nil;
-
-    this._zOrder = 0;
-    this:setter("zOrder", function(v)
-        if this._zOrder ~= v then
-            this._zOrder = v;
-            if this.parent then
-                Timer:callLater(this.parent, this.parent.zOrderSort)
-            end
-        end
-    end)
-    this:getter("zOrder", function()
-        return this._zOrder or 0;
-    end)
-
-
-    this._width = nil
-    this:setter("width", function(v)
-        this._width = v;
-        this.autoSize = false;
-        this:_changeSize()
-    end)
-    this:getter("width", function()
-        return this._width or 0;
-    end)
-
-    this._height = nil
-    this:setter("height", function(v)
-        this._height = v;
-        this.autoSize = false;
-        this:_changeSize()
-    end)
-    this:getter("height", function()
-        return this._height or 0;
-    end)
-
-
-    this:getter("displayedInStage", function()
-        local node = this;
-        while node do
-            if not node.visible or not node.parent then
-                break
-            end
-            node = node.parent;
-        end
-        return node._gid == 1 and node.visible;
-    end)
-    this.mouseEnabled = false;
-    this.mouseThrough = false;
+    self:setter_getter("x", self.__setX, self.__getX);
+    self:setter_getter("y", self.__setY, self.__getY);
+    self:setter_getter("scaleX", self.__setScaleX, self.__getScaleX);
+    self:setter_getter("scaleY", self.__setScaleY, self.__getScaleY);
+    self:setter_getter("rotation", self.__setRotation, self.__getRotation);
+    self:setter_getter("zOrder", self.__setZOrder, self.__getZOrder);
 
 end
 
----@param node Drawable
-local function _mouseEnable(node)
-    local parent = node
+---@protected
+function c:__setX(v)
+    if self._x ~= v then
+        self._x = v
+        self:__calcTransfrom();
+    end
+end
+
+---@protected
+function c:__getX()
+    return self._x or 0;
+end
+
+---@protected
+function c:__setY(v)
+    if self._y ~= v then
+        self._y = v
+        self:__calcTransfrom();
+    end
+end
+
+---@protected
+function c:__getY()
+    return self._y or 0;
+end
+
+---@protected
+function c:__setScaleX(v)
+    if self._scaleX ~= v then
+        self._scaleX = v
+        self:__calcTransfrom();
+    end
+end
+
+---@protected
+function c:__getScaleX()
+    return self._scaleX or 1;
+end
+
+---@protected
+function c:__setScaleY(v)
+    if self._scaleY ~= v then
+        self._scaleY = v;
+        self:__calcTransfrom();
+    end
+end
+
+---@protected
+function c:__getScaleY()
+    return self._scaleY or 1;
+end
+
+---@protected
+function c:__setRotation(v)
+    if self._rotation ~= v then
+        self._rotation = v;
+        self:__calcTransfrom();
+    end
+end
+
+---@protected
+function c:__getRotation()
+    return self._rotation or 0;
+end
+
+---@protected
+function c:__setZOrder(v)
+    if v ~= self._zOrder then
+        self._zOrder = v;
+        self:zOrderSort()
+    end
+end
+
+---@protected
+function c:__getZOrder()
+    return self._zOrder or 0;
+end
+
+---@public
+function c:zOrderSort()
+    table.sort(self._childs, _sort);
+end
+
+---@protected
+function c:__calcTransfrom()
+    if self.transform then
+        self.transform:reset();
+        self.transform:translate(self._x or 0, self._y or 0);
+        self.transform:rotate(math.rad(self.rotation or 0));
+        self.transform:scale(self._scaleX or 1, self._scaleY or 1);
+    end
+end
+
+---@protected
+---@param bool boolean
+function c:_mouseEnable(bool)
+    local parent = self
     while parent do
         -- 开启全部父节点可以点击
-        parent.mouseEnabled = true;
+        parent.touchEnabled = bool;
         parent = parent.parent
     end
 end
 
----@param this Drawable
----@param type string
-function Drawable.on(this, type, func, args)
-    Message.on(this, type, func, args)
-    if UIEvent.isMouseEvent(type) then
-        _mouseEnable(this);
+---@overload
+function c:on(type, func, caller, args)
+    if TouchEvent.IsTouchEvent(type) then
+        self:_mouseEnable(true);
     end
-    return this
+    return Node.on(self, type, func, caller, args);
 end
 
----@param this Drawable
----@param node Drawable
+---@overload
+---@param node Node_Core_Display_Drawable
 ---@param index number
----@return Node
-function Drawable.addChildAt(this, node, index)
-    Node.addChildAt(this, node, index)
-    this.sortTabel = this.sortTabel or {}
-    this.sortTabel[node] = Utils.getGID();    --this:numChild() + 1
-    if node.mouseEnabled then
-        _mouseEnable(this);
-    end
-    this:zOrderSort()
-end
-function Drawable.removeChildAt(this, node, index)
-    Node.removeChildAt(this, node, index)
-    if this.sortTabel then
-        this.sortTabel[node] = nil
-    end
-end
-
----@public
-function Drawable:zOrderSort()
-    table.sort(self.components, _sort);
-end
-
----@field public x number
----@field public y number
----@field public width number
----@field public height number
----@field public pivotX number
----@field public pivotY number
----@field public scaleX number
----@field public scaleY number
----@field public alpha number
----@field public rotation number
----@field public visible boolean
----@field public graphics Graphics
-
----@param this Drawable
----@param x number
----@param y number
----@return Drawable
-function Drawable.pos(this, x, y)
-    this.x, this.y = x, y;
-    return this;
-end
-
----@param this Drawable
----@param x number
----@param y number
----@return Drawable
-function Drawable.scale(this, x, y)
-    this.scaleX, this.scaleY = x, y;
-    return this;
-end
-
----@param this Drawable
----@param x number
----@param y number
----@return Drawable
-function Drawable.pivot(this, x, y)
-    this.pivotX, this.pivotY = x, y;
-    return this;
-end
-
----@param this Drawable
----@param w number
----@param h number
----@return Drawable
-function Drawable.size(this, w, h)
-    this.width, this.height = w, h;
-    return this;
-end
-
----@protected
-function Drawable:_addToRenderLine()
-    self.renderArea = true;
-    for _, dw in ipairs(renderLine) do
-        if dw == self then
-            break;
+---@return Node_Core_Display_Drawable
+function c:addChildAt(node, index)
+    if node.__render then
+        Node.addChildAt(self, node, index);
+        self.sortTabel = self.sortTabel or {}
+        self.sortTabel[node] = Util.getGID();    --this:numChild() + 1
+        if node.touchEnabled then
+            self:_mouseEnable(true);
         end
+        self:zOrderSort();
+    else
+        print("error: 0x0010");
     end
-    table.insert(renderLine, self);
+    return self;
+end
+
+function c:removeChildAt(index)
+    local node = Node.removeChildAt(self, index)
+    if self.sortTabel then
+        self.sortTabel[node] = nil;
+    end
+    return node;
 end
 
 ---@protected
-function Drawable:_removeForRenderLide()
-    self.renderArea = false;
-    for i = #renderLine, 1, -1 do
-        if renderLine[i] == self then
-            table.remove(renderLine, i);
-        end
+---@return Node_Core_Display_Drawable__RenderState
+function c:__push()
+    ---@type Node_Core_Display_Drawable__RenderState
+    local state = {};
+    state.r, state.g, state.b, state.alpha = getColor()
+    state.blendMode = getBlendMode();
+    if self.alpha < 1 then
+        setColor(state.r, state.g, state.b, state.alpha * self.alpha);
     end
-end
-
----@protected
----@param graphics graphics
-function Drawable:_renderRenderLine(graphics)
-    for _, dw in ipairs(renderLine) do
-        if dw.destroyed or not dw.visible or not dw.displayedInStage then
-        else
-            graphics.setCanvas(dw._canvas)
-            graphics.clear()
-            dw:_render(graphics)
-        end
-    end
-    graphics.setCanvas()
-end
-
----@protected
----@param graphics graphics
-function Drawable:_render2(graphics)
-    if self._canvas then
-        graphics.draw(self._canvas, 0, 0);
-    end
-end
-
----@param this Drawable
----@param x number
----@param y number
-function Drawable.localToGlobal(this, x, y)
-    local parent = this;
-    while parent do
-        x = x * parent.scaleX + (parent.x - parent.pivotX)
-        y = y + parent.y - parent.pivotY
-        parent = parent.parent;
-    end
-    return x, y;
-end
-
----@param this Drawable
----@param x number
----@param y number
-function Drawable.globalToLocal(this, x, y)
-    return x, y;
-end
-
----@protected
----@param this Drawable
----@param graphics graphics
----@return Drawable
-function Drawable._render(this, graphics)
-    if not this.visible or this.destroyed or this.alpha == 0 or this._scaleY == 0 or this._scaleX == 0 then
-        -- 已经不会显示出来了
-        return this;
-    end
-    local r, g, b, a, blendMode = this:_push()
-
-    if this._draw then
-        this._draw(this, graphics);
-    end
-    this:_renderChildren(graphics);
-    return this:_pop(r, g, b, a, blendMode)
-end
-
----@protected
----@param graphics graphics
-function Drawable._renderChildren(this, graphics)
-    translate(-this.pivotX, -this.pivotY);
-    for _, drawable in ipairs(this.components) do
-        if drawable.renderArea then
-            drawable:_render2(graphics)
-        elseif drawable._render then
-            drawable:_render(graphics)
-        end
-    end
-end
-
----@protected
----@return number,number,number,number
-function Drawable._push(this)
-    local r, g, b, a = gr.getColor()
-    gr.setColor(r, g, b, this.alpha * a)
-    local blendMode
-    if this.blendMode == "lighter" then
-        blendMode = gr.getBlendMode();
-        gr.setBlendMode("add")
+    if self.blendMode then
+        setBlendMode(self.blendMode);
     end
     push()
-    gr.applyTransform(this.transform);
-    return r, g, b, a, blendMode;
+    --if self.rotation % 360 ~= 0 and self._childs[1] then
+    --end
+    applyTransform(self.transform);
+    return state;
 end
 
 ---@protected
----@return Drawable
-function Drawable._pop(this, r, g, b, a, blendMode)
-    gr.setColor(r, g, b, a)
-    if blendMode then
-        gr.setBlendMode(blendMode)
+---@param state Node_Core_Display_Drawable__RenderState
+---@return Node_Core_Display_Drawable
+function c:__pop(state)
+    if self.alpha < 1 then
+        setColor(state.r, state.g, state.b, state.alpha);
+    end
+    if self.blendMode then
+        setBlendMode(state.blendMode);
     end
     pop()
-    return this;
-end
-
------@protected
------@param graphics graphics
---function Drawable:_draw(graphics)
---end
-
----@protected
----@param dw Drawable
-function Drawable._transform(this)
-    this.transform:reset();
-    this.transform:translate(this.x, this.y);
-    this.transform:rotate(math.rad(this.rotation));
-    this.transform:scale(this.scaleX, this.scaleY);
-    -- this.transform:translate(-this.pivotX,-this.pivotY);
+    return self;
 end
 
 ---@protected
----@param this Drawable
-function Drawable._calcTransform(this)
-    Timer:callLater(this, this._transform, this)
+---@param gr graphics
+---@return Node_Core_Display_Drawable
+function c:__render(gr)
+    if self.destroyed or not self.visible --[[ or self.alpha == 0 or self._scaleY == 0 or self._scaleX == 0 --]] then
+        return self;
+    end
+    local state = self:__push()
+    self:__draw(gr);
+    self:__renderChildren(gr);
+    return self:__pop(state)
 end
 
 ---@protected
----@param this Drawable
-function Drawable._changeSize(this)
-    this:event(UIEvent.RESIZE)
+---@param gr graphics
+function c:__draw(gr)
 end
 
-return Drawable;
+---@protected
+---@param gr graphics
+function c:__renderChildren(gr)
+    --- 理论上比 self:numChild() > 0  快
+    if self._childs[1] then
+        translate(-self.pivotX, -self.pivotY);
+        for _, d in ipairs(self._childs) do
+            d:__render(gr)
+        end
+    end
+end
+
+---@param x1 number
+---@param y1 number
+---@return boolean @只需要检测原始宽高即可 缩放系数已经在 x,y 中处理
+function c:hitTest(x1, y1)
+    return x1 > 0 and y1 > 0 and x1 <= self.width and y1 <= self.height;
+end
+
+function c:destroy(destroyChild)
+    Node.destroy(self, destroyChild);
+end
+
+---@param x number
+---@param y number
+---@return Node_Core_Display_Drawable
+function c:pos(x, y)
+    self.x, self.y = x, y;
+    return self;
+end
+
+---@param x number
+---@param y number
+---@return Node_Core_Display_Drawable
+function c:scale(x, y)
+    self.scaleX, self.scaleY = x, y;
+    return self;
+end
+
+---@param x number
+---@param y number
+---@return Node_Core_Display_Drawable
+function c:pivot(x, y)
+    self.pivotX, self.pivotY = x, y;
+    return self;
+end
+
+---@param w number
+---@param h number
+---@return Node_Core_Display_Drawable
+function c:size(w, h)
+    self.width, self.height = w, h;
+    return self;
+end
+
+---@param x number
+---@param y number
+function c:localToGlobal(x, y)
+    x, y = self:localToParent(x, y)
+    local p = self.parent
+    if p then
+        x, y = p:localToGlobal(x, y)
+    end
+    return x, y
+end
+
+---@param x number
+---@param y number
+function c:globalToLocal(x, y)
+    local p = self.parent
+    if p then
+        x, y = p:globalToLocal(x, y)
+    end
+    return self:parentToLocal(x, y)
+end
+
+function c:parentToLocal(x, y)
+    -- translate
+    x = x - self.x
+    y = y - self.y
+    -- rotate
+    local r = -math.rad(self.rotation)
+    local c = math.cos(r)
+    local s = math.sin(r)
+    local rx = c * x - s * y
+    local ry = s * x + c * y
+    x, y = rx, ry
+    -- scale
+    x = x * self.scaleX
+    y = y * self.scaleY
+    return x, y
+end
+
+function c:localToParent(x, y)
+    -- scale
+    x = x / self.scaleX
+    y = y / self.scaleY
+    -- rotate
+    local r = math.rad(self.rotation)
+    local c = math.cos(r)
+    local s = math.sin(r)
+    local rx = c * x - s * y
+    local ry = s * x + c * y
+    x, y = rx, ry
+    -- translate
+    x = x + self.x
+    y = y + self.y
+    return x, y
+end
+
+return c;
+
+---@class Node_Core_Display_Drawable__RenderState
+---@field alpha number @0-1
+---@field r number
+---@field g number
+---@field b number
+---@field blendMode string
