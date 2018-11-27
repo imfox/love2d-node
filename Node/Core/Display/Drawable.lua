@@ -131,7 +131,7 @@ end
 function c:__setZOrder(v)
     if v ~= self._zOrder then
         self._zOrder = v;
-        self:zOrderSort()
+        self:reorderChild()
     end
 end
 
@@ -141,7 +141,7 @@ function c:__getZOrder()
 end
 
 ---@public
-function c:zOrderSort()
+function c:reorderChild()
     table.sort(self._childs, _sort);
 end
 
@@ -186,7 +186,7 @@ function c:addChildAt(node, index)
         if node.touchEnabled then
             self:_mouseEnable(true);
         end
-        self:zOrderSort();
+        self:reorderChild();
     else
         print("error: 0x0010");
     end
