@@ -1,36 +1,35 @@
-local modules = (...):gsub('%.[^%.]+$', '') .. ".";
+---@type Class
+local Class = require("class");
+local Event = require("node.modules.Event");
+local EventDispatcher = require("node.modules.EventDispatcher");
 
-local Class = require(modules .. "Class");
-local Event = require(modules .. "Event");
-local EventDispatcher = require(modules .. "EventDispatcher");
-
----@class Node_Core_Display_Node : Node_EventDispatcher
+---@class Node_Node : Node_EventDispatcher
 local c = Class(EventDispatcher);
----@field public new Node_Core_Display_Node
----@field protected _childs Node_Core_Display_Node[] @子组件数组
+---@field public new Node_Node
+---@field protected _childs Node_Node[] @子组件数组
 ---@field public name string @名称
----@field public parent Node_Core_Display_Node @父对象
+---@field public parent Node_Node @父对象
 ---@field public destroyed boolean @是否已经被销毁
 
 function c:ctor()
     EventDispatcher.ctor(self)
     self.name = "";
-    ---@type Node_Core_Display_Node[]
+    ---@type Node_Node[]
     self._childs = {};
     self.parent = nil;
     self.destroyed = false;
 end
 
----@param node Node_Core_Display_Node
----@return Node_Core_Display_Node
+---@param node Node_Node
+---@return Node_Node
 function c:addChild(node)
     self:addChildAt(node, #self._childs + 1);
     return self;
 end
 
----@param node Node_Core_Display_Node
+---@param node Node_Node
 ---@param index number
----@return Node_Core_Display_Node
+---@return Node_Node
 function c:addChildAt(node, index)
     if self.destroyed or node == nil or node.destroyed or node == self then
         return self;
@@ -54,8 +53,8 @@ function c:addChildAt(node, index)
     return self;
 end
 
----@param ... Node_Core_Display_Node[]
----@return Node_Core_Display_Node
+---@param ... Node_Node[]
+---@return Node_Node
 function c:addChildren(...)
     local ns = { ... };
     for _, n in ipairs(ns) do
@@ -64,23 +63,23 @@ function c:addChildren(...)
     return self;
 end
 
----@param parent Node_Core_Display_Node
----@return Node_Core_Display_Node
+---@param parent Node_Node
+---@return Node_Node
 function c:addTo(parent)
     parent:addChild(self);
     return self;
 end
 
----@param node Node_Core_Display_Node
----@return Node_Core_Display_Node
+---@param node Node_Node
+---@return Node_Node
 function c:removeChild(node)
     return self:removeChildAt(self:getChildIndex(node))
 end
 
 ---@param index number
----@return Node_Core_Display_Node
+---@return Node_Node
 function c:removeChildAt(index)
-    ---@type Node_Core_Display_Node
+    ---@type Node_Node
     local node = table.remove(self._childs, index);
     if node then
         node.parent = nil;
@@ -90,12 +89,12 @@ function c:removeChildAt(index)
 end
 
 ---@param name string
----@return Node_Core_Display_Node
+---@return Node_Node
 function c:removeChildByName(name)
     return self:removeChild(self:getChildByName(name));
 end
 
----@return Node_Core_Display_Node
+---@return Node_Node
 ---@param begin number
 ---@param endl number
 function c:removeChildren(begin, endl)
@@ -107,7 +106,7 @@ function c:removeChildren(begin, endl)
     return self;
 end
 
----@return Node_Core_Display_Node
+---@return Node_Node
 function c:removeSelf()
     if self.parent ~= nil then
         self.parent:removeChild(self);
@@ -116,7 +115,7 @@ function c:removeSelf()
 end
 
 ---@param name string
----@return Node_Core_Display_Node
+---@return Node_Node
 function c:getChildByName(name)
     for index = #self._childs, 1, -1 do
         if (name == self._childs[index].name) then
@@ -126,12 +125,12 @@ function c:getChildByName(name)
 end
 
 ---@param index number
----@return Node_Core_Display_Node
+---@return Node_Node
 function c:getChildAt(index)
     return self._childs[index];
 end
 
----@param node Node_Core_Display_Node
+---@param node Node_Node
 ---@return number
 function c:getChildIndex(node)
     for index = #self._childs, 1, -1 do
@@ -142,9 +141,9 @@ function c:getChildIndex(node)
     return -1;
 end
 
----@param newNode Node_Core_Display_Node
----@param node Node_Core_Display_Node
----@return Node_Core_Display_Node
+---@param newNode Node_Node
+---@param node Node_Node
+---@return Node_Node
 function c:replaceChild(node, newNode)
     local index = self:getChildIndex(node);
     if index > 0 and newNode then
@@ -159,7 +158,7 @@ function c:replaceChild(node, newNode)
     return self;
 end
 
----@param node Node_Core_Display_Node
+---@param node Node_Node
 ---@return boolean
 function c:contains(node)
     return self:getChildIndex(node) > 0;
@@ -187,7 +186,7 @@ function c:destroy(destroyChild)
     self:offAll();
 end
 
----@return Node_Core_Display_Node
+---@return Node_Node
 function c:destroyChildren()
     for i = #self._childs, 1, -1 do
         self._childs[i]:destroy(true);

@@ -1,8 +1,7 @@
-local modules = (...):gsub('%.[^%.]+$', '') .. ".";
-local Class = require(modules .. "Class");
+local Class = require("class");
 ---@type Node_Handler
-local Handler = require(modules .. "Handler");
----@class Node_EventDispatcher : Node_Class
+local Handler = require("node.modules.Handler");
+---@class Node_EventDispatcher : Class
 ---@field protected _events table<string,Node_Handler[]>
 local c = Class();
 

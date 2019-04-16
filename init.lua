@@ -8,8 +8,6 @@ local node = {
 }
 
 local files = {
-    "Utils",
-    "Class",
     "Handler",
     "Event",
     "EventDispatcher",
