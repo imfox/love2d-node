@@ -1,4 +1,4 @@
-local modules = (...) and (...):gsub('%.init$', '') .. ".modules." or ""
+local modules = "node.modules."
 
 local node = {
     _LICENSE = "NODE is distributed under the terms of the MIT license. See LICENSE.md.",

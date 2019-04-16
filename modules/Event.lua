@@ -1,5 +1,4 @@
-local modules = (...):gsub('%.[^%.]+$', '') .. ".";
-local Class = require(modules .. "Class");
+local Class = require("class");
 ---@class Node_Event
 local c = Class();
 
