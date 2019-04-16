@@ -1,12 +1,13 @@
-local Class = require("Node.Core.Class");
+local modules = (...):gsub('%.[^%.]+$', '') .. ".";
+local Class = require(modules .. "Class");
 
 local _gid = 1;
 
----@type Node_Core_Utils_Handler[]
+---@type Node_Handler[]
 local _pool = {};
 
----@class Node_Core_Utils_Handler : Node_Core_Class
----@field new fun(caller:any, func:fun, args:any[], once:boolean):Node_Core_Utils_Handler
+---@class Node_Handler : Node_Class
+---@field new fun(caller:any, func:fun, args:any[], once:boolean):Node_Handler
 local c = Class();
 
 ---@param caller any
@@ -21,7 +22,7 @@ end
 ---@param func fun
 ---@param args any[]
 ---@param once boolean
----@return Node_Core_Utils_Handler
+---@return Node_Handler
 function c:set(caller, func, args, once)
     self.caller = caller;
     self.func = func;
@@ -32,7 +33,7 @@ function c:set(caller, func, args, once)
     return self;
 end
 
----@return Node_Core_Utils_Handler
+---@return Node_Handler
 function c:clear()
     self.caller = nil;
     self.func = nil;
@@ -84,7 +85,7 @@ end
 ---@param func fun
 ---@param args any[]
 ---@param once boolean
----@return Node_Core_Utils_Handler
+---@return Node_Handler
 function c.Create(caller, func, args, once)
     if #_pool > 0 then
         return table.remove(_pool, 1):set(caller, func, args, once);

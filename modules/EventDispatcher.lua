@@ -1,7 +1,9 @@
-local Class = require("Node.Core.Class");
-local Handler = require("Node.Core.Utils.Handler");
----@class Node_Core_Event_EventDispatcher : Node_Core_Class
----@field protected _events table<string,Node_Core_Utils_Handler[]>
+local modules = (...):gsub('%.[^%.]+$', '') .. ".";
+local Class = require(modules .. "Class");
+---@type Node_Handler
+local Handler = require(modules .. "Handler");
+---@class Node_EventDispatcher : Node_Class
+---@field protected _events table<string,Node_Handler[]>
 local c = Class();
 
 ---@private
@@ -10,7 +12,7 @@ local c = Class();
 ---@param caller any
 ---@param args any[]
 ---@param offBefore boolean
----@return Node_Core_Event_EventDispatcher
+---@return Node_EventDispatcher
 function c:__createListener(type, func, caller, args, once, offBefore)
     if type then
         offBefore = offBefore or true;
@@ -31,7 +33,7 @@ end
 ---@param func fun
 ---@param caller any
 ---@param args any[]
----@return Node_Core_Event_EventDispatcher
+---@return Node_EventDispatcher
 function c:on(type, func, caller, args)
     self:__createListener(type, func, caller, args, false);
     return self;
@@ -41,7 +43,7 @@ end
 ---@param func fun
 ---@param caller any
 ---@param args any[]
----@return Node_Core_Event_EventDispatcher
+---@return Node_EventDispatcher
 function c:once(type, func, caller, args)
     self:__createListener(type, func, caller, args, true);
     return self;
@@ -79,7 +81,7 @@ end
 ---@param func fun
 ---@param caller any
 ---@param args any[]
----@return Node_Core_Event_EventDispatcher
+---@return Node_EventDispatcher
 function c:off(type, func, caller, onceOnly)
     if not self._events or not self._events[type] then
         return self
@@ -87,7 +89,7 @@ function c:off(type, func, caller, onceOnly)
     for i = #self._events[type], 1, -1 do
         local event = self._events[type][i];
         if event.func == func and caller == event.caller and (not onceOnly or event.once) then
-            ---@type Node_Core_Utils_Handler
+            ---@type Node_Handler
             local e = table.remove(self._events[type], i);
             if e then
                 e:recover();
@@ -107,7 +109,7 @@ function c:offAll(type)
             return self
         end
         for i = #self._events[type], 1, -1 do
-            ---@type Node_Core_Utils_Handler
+            ---@type Node_Handler
             local e = table.remove(self._events[type], i);
             if e then
                 e:recover();

@@ -1,13 +1,14 @@
-local clone = require("Node.Core.Utils.Utils").tableClone;
+local modules = (...):gsub('%.[^%.]+$', '') .. ".";
+local clone = require(modules .. "Utils").tableClone;
 
----@class Node_Core_Class
----@field new fun:Node_Core_Class
----@field protected setter fun(self:Node_Core_Class,key:string,func:fun)
----@field protected getter fun(self:Node_Core_Class,key:string,func:fun)
----@field protected setter_getter fun(self:Node_Core_Class,key:string,set:fun,get:fun)
----@field protected ctor fun(self:Node_Core_Class)
+---@class Node_Class
+---@field new fun:Node_Class
+---@field protected setter fun(self:Node_Class,key:string,func:fun)
+---@field protected getter fun(self:Node_Class,key:string,func:fun)
+---@field protected setter_getter fun(self:Node_Class,key:string,set:fun,get:fun)
+---@field protected ctor fun(self:Node_Class)
 
----@return Node_Core_Class
+---@return Node_Class
 local function Class(...)
     -- super list
     local cls

@@ -1,8 +1,10 @@
-local Class = require("Node.Core.Class");
-local Event = require("Node.Core.Event.Event");
-local EventDispatcher = require("Node.Core.Event.EventDispatcher");
+local modules = (...):gsub('%.[^%.]+$', '') .. ".";
 
----@class Node_Core_Display_Node : Node_Core_Event_EventDispatcher
+local Class = require(modules .. "Class");
+local Event = require(modules .. "Event");
+local EventDispatcher = require(modules .. "EventDispatcher");
+
+---@class Node_Core_Display_Node : Node_EventDispatcher
 local c = Class(EventDispatcher);
 ---@field public new Node_Core_Display_Node
 ---@field protected _childs Node_Core_Display_Node[] @子组件数组
