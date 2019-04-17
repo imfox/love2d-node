@@ -1,9 +1,15 @@
 local Class = require("class");
+---@type Node_HashCode
+local HashCode = require("node.modules.HashCode");
 ---@type Node_Handler
 local Handler = require("node.modules.Handler");
----@class Node_EventDispatcher : Class
+---@class Node_EventDispatcher : Node_HashCode
 ---@field protected _events table<string,Node_Handler[]>
-local c = Class();
+local c = Class(HashCode);
+
+function c:ctor()
+    HashCode.ctor(self);
+end
 
 ---@private
 ---@param type string
