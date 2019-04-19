@@ -21,7 +21,7 @@ end
 function c:__createListener(type, func, caller, args, once, offBefore)
     if type then
         offBefore = offBefore or true;
-        if offBefore then
+        if offBefore and self:hasListener(type) then
             self:off(type, func, caller)
         end
         local handler = Handler.Create(caller, func, args, once);
@@ -104,9 +104,25 @@ function c:off(type, func, caller, onceOnly)
     return self;
 end
 
----@type string
+---@param type string
 function c:offAll(type)
     if not self._events then
+        return self
+    end
+    if type ~= nil then
+        self:offType(type);
+    else
+        for k, _ in pairs(self._events) do
+            self:offType(k);
+        end
+    end
+    return self;
+end
+
+---@private
+---@param type string
+function c:offType(type)
+    if not self._events or not self._events[type] then
         return self
     end
     if type ~= nil then
@@ -116,13 +132,9 @@ function c:offAll(type)
         for i = #self._events[type], 1, -1 do
             ---@type Node_Handler
             local e = table.remove(self._events[type], i);
-            if e then
-                e:recover();
-            end
+            self:off(type, e.func, e.caller)
         end
-        self._events[type] = nil;
-    else
-        self._events = nil;
+        self._events[type] = {};
     end
     return self;
 end

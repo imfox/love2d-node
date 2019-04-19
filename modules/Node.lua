@@ -161,7 +161,13 @@ end
 ---@param node Node_Node
 ---@return boolean
 function c:contains(node)
-    return self:getChildIndex(node) > 0;
+    while node do
+        if node == self then
+            return true;
+        end
+        node = node.parent;
+    end
+    return false;
 end
 
 ---@return number
