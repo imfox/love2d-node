@@ -1,6 +1,5 @@
-local Class = require("class");
 ---@class Node_Event
-local c = Class();
+local c = {};
 
 c.ADDED = "ADDED"
 c.REMOVED = "REMOVED"
