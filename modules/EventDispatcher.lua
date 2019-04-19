@@ -125,17 +125,12 @@ function c:offType(type)
     if not self._events or not self._events[type] then
         return self
     end
-    if type ~= nil then
-        if not self._events[type] then
-            return self
-        end
-        for i = #self._events[type], 1, -1 do
-            ---@type Node_Handler
-            local e = table.remove(self._events[type], i);
-            self:off(type, e.func, e.caller)
-        end
-        self._events[type] = {};
+    for i = #self._events[type], 1, -1 do
+        ---@type Node_Handler
+        local e = table.remove(self._events[type], i);
+        self:off(type, e.func, e.caller)
     end
+    self._events[type] = {};
     return self;
 end
 
