@@ -34,14 +34,8 @@ function c:addChildAt(node, index)
     if self.destroyed or node == nil or node.destroyed or node == self then
         return self;
     end
-    -- 有可能是自己的祖节点
-    local p = self;
-    while p do
-        p = p.parent;
-        if p == node then
-            self:removeSelf();
-            break
-        end
+    if node:contains(self) then
+        self:removeSelf();
     end
     if node.parent then
         node.parent:removeChild(node);

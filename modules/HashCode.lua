@@ -15,6 +15,7 @@ function c:ctor()
     self:getter("gid", self.__getGid);
 end
 
+---@private
 function c:__getGid()
     return self._gid;
 end
