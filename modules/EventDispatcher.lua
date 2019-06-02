@@ -57,8 +57,10 @@ end
 ---@param type string
 ---@return boolean
 function c:hasListener(type)
-    local e = self._events and self._events[type];
-    return not (not e);
+    if self._events and self._events[type] then
+        return #self._events[type] > 0
+    end
+    return false;
 end
 
 ---@param type string

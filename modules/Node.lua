@@ -42,8 +42,8 @@ function c:addChildAt(node, index)
     end
     index = math.min(index, #self._childs + 1);
     table.insert(self._childs, index, node);
-    node:event(Event.ADDED);
     node.parent = self;
+    node:event(Event.ADDED);
     return self;
 end
 
@@ -76,6 +76,7 @@ function c:removeChildAt(index)
     ---@type Node_Node
     local node = table.remove(self._childs, index);
     if node then
+        node:event(Event.BEFORE_REMOVE);
         node.parent = nil;
         node:event(Event.REMOVED);
     end
